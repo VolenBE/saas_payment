@@ -1,0 +1,43 @@
+import sqlite3
+import getpass # might be useless in this case
+
+logged_in = 0
+
+# we ask the user about his/her details
+
+username = input('Your username:')
+userpass = getpass.getpass('Your password:')
+
+# Establish a connection to the database
+
+dbase = sqlite3.connect('database.db', isolation_level=None)
+cursor = dbase.cursor()
+
+cursor.execute('SELECT * FROM Users WHERE username = ? AND password = ?', (username, userpass)) # we make a sql request to see if there is a matching record
+
+if cursor.fetchall():
+    print('Welcome', username) # if there is a matching record we welcome the user
+    logged_in = 1
+else:
+    print("Sorry it seems we can't find you in our database") #if there is no matching record we tell the user
+    register = int(input("Would you like to register? If so please type 1"))
+    if register == 1:
+        wanted_username = input('Please choose a username:')
+        wanted_password = input('Please choose a password:')
+        bankaccount = input('Bank account:')
+        address = input('Address:')
+        vatid = input('Your vat id:')
+        company_name = input('Your company name:')
+        dbase.execute(''' 
+            INSERT INTO Users(username,password,bankaccount,address)
+            VALUES(?,?,?,?)''', (wanted_username, wanted_password, bankaccount, address))
+        print("Account successfully created")
+    else:
+        print('Bye bye')
+
+if logged_in == 1:
+    actions = input("Please tell us what would you like to do: \n Type 1 to register a new user")
+else:
+    print('None')
+
+
