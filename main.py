@@ -75,6 +75,11 @@ if logged_in == 1:
             INSERT INTO Users(username,password,bankaccount,address)
             VALUES(?,?,?,?)''', (customer_username, customer_password, customer_bankaccount, customer_address))
         print("Customer account successfully created")
+        temp_id = int(cursor.lastrowid)
+        dbase.execute(''' 
+            INSERT INTO Clients(client_id)
+            VALUES(?)''', (temp_id))
+        print("Client id added to the Clients table")
     elif actions == 2:
         print('2')
     elif actions == 3:
