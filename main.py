@@ -71,11 +71,12 @@ if logged_in == 1:
         customer_password = input('Please choose a password for your customer:')
         customer_bankaccount = input('Please provide your customer bank account number:')
         customer_address = input('Please provide your customer address:')
-        dbase.execute(''' 
+        cursor.execute(''' 
             INSERT INTO Users(username,password,bankaccount,address)
             VALUES(?,?,?,?)''', (customer_username, customer_password, customer_bankaccount, customer_address))
         print("Customer account successfully created")
         temp_id = int(cursor.lastrowid)
+        print(temp_id)
         dbase.execute(''' 
             INSERT INTO Clients(client_id)
             VALUES(?)''', (temp_id))
