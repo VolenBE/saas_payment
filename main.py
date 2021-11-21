@@ -67,7 +67,14 @@ else:
 if logged_in == 1:
     actions = int(input("Please tell us what would you like to do: \n Type 1 to register a new Customer \n Type 2 to create a quote \n Type 3 to convert a quote into a subscription \n Type 4 to retrieve statistics"))
     if actions == 1:
-        print('1')
+        customer_username = input('Please choose a username for your customer:')
+        customer_password = input('Please choose a password for your customer:')
+        customer_bankaccount = input('Please provide your customer bank account number:')
+        customer_address = input('Please provide your customer address:')
+        dbase.execute(''' 
+            INSERT INTO Users(username,password,bankaccount,address)
+            VALUES(?,?,?,?)''', (customer_username, customer_password, customer_bankaccount, customer_address))
+        print("Customer account successfully created")
     elif actions == 2:
         print('2')
     elif actions == 3:
