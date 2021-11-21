@@ -32,7 +32,7 @@ def checkCard(card_number):
     else:
         return False
 
-# we ask the user about his/her details
+# we ask the user about his/her details, we should add a check to know if the user is a company or a client
 
 username = input('Your username:')
 userpass = getpass.getpass('Your password:')
