@@ -1,7 +1,38 @@
 import sqlite3
 import getpass # might be useless in this case
 
+# Initialize variables
+
 logged_in = 0
+
+# Functions
+
+def checkCard(card_number):
+     
+    digits = len(card_number)
+    sum_numbers = 0
+    isSecond = False
+     
+    for i in range(digits - 1, -1, -1):
+        d = ord(card_number[i]) - ord('0')
+     
+        if (isSecond == True):
+            d = d * 2
+  
+        # We add two digits to handle
+        # cases that make two digits after
+        # doubling
+        sum_numbers += d // 10
+        sum_numbers += d % 10
+  
+        isSecond = not isSecond
+     
+    if (sum_numbers % 10 == 0):
+        return True
+    else:
+        return False
+ 
+# Driver code  
 
 # we ask the user about his/her details
 
@@ -36,8 +67,18 @@ else:
         print('Bye bye')
 
 if logged_in == 1:
-    actions = input("Please tell us what would you like to do: \n Type 1 to register a new user")
+    actions = int(input("Please tell us what would you like to do: \n Type 1 to register a new Customer \n Type 2 to create a quote \n Type 3 to convert a quote into a subscription \n Type 4 to retrieve statistics"))
+    if actions == 1:
+        print('1')
+    elif actions == 2:
+        print('2')
+    elif actions == 3:
+        print('3')
+    elif actions == 4:
+        print('4')
 else:
-    print('None')
+    exit()
+
+
 
 
