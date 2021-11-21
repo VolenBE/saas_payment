@@ -31,8 +31,6 @@ def checkCard(card_number):
         return True
     else:
         return False
- 
-# Driver code  
 
 # we ask the user about his/her details
 
