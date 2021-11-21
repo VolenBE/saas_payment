@@ -1,5 +1,6 @@
 import sqlite3
 import getpass # might be useless in this case
+import json
 
 # Initialize variables
 
@@ -87,6 +88,11 @@ if logged_in == 1:
             INSERT INTO Clients(client_id)
             VALUES(?)''', (client_id,))
         print("Client id added to the Clients table")
+        sclient_id = json.dumps(client_id)
+        cursor.execute('''
+            INSERT INTO Companies(client_ids_list)
+            VALUES(?)''', (sclient_id))
+        print("Client added to the clients ids list")
     elif actions == 2:
         print('2')
     elif actions == 3:
