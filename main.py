@@ -57,10 +57,15 @@ else:
         address = input('Address:')
         vatid = input('Your vat id:')
         company_name = input('Your company name:')
-        dbase.execute(''' 
+        cursor.execute(''' 
             INSERT INTO Users(username,password,bankaccount,address)
             VALUES(?,?,?,?)''', (wanted_username, wanted_password, bankaccount, address))
         print("Account successfully created")
+        company_id = int(cursor.lastrowid)
+        print(company_id)
+        cursor.execute('''
+            INSERT INTO Companies(company_id, vatid, company_name)
+            VALUES(?,?,?,?)''', (company_id, vatid, company_name))
     else:
         print('Bye bye')
 
@@ -75,11 +80,11 @@ if logged_in == 1:
             INSERT INTO Users(username,password,bankaccount,address)
             VALUES(?,?,?,?)''', (customer_username, customer_password, customer_bankaccount, customer_address))
         print("Customer account successfully created")
-        temp_id = int(cursor.lastrowid)
-        print(temp_id)
+        client_id = int(cursor.lastrowid)
+        print(client_id)
         cursor.execute(''' 
             INSERT INTO Clients(client_id)
-            VALUES(?)''', (temp_id,))
+            VALUES(?)''', (client_id,))
         print("Client id added to the Clients table")
     elif actions == 2:
         print('2')
