@@ -8,29 +8,30 @@ logged_in = 0
 # Functions
 
 def checkCard(card_number):
-     
-    digits = len(card_number)
-    sum_numbers = 0
-    isSecond = False
-     
-    for i in range(digits - 1, -1, -1):
-        d = ord(card_number[i]) - ord('0')
-     
-        if (isSecond == True):
-            d = d * 2
-  
-        # We add two digits to handle
-        # cases that make two digits after
-        # doubling
-        sum_numbers += d // 10
-        sum_numbers += d % 10
-  
-        isSecond = not isSecond
-     
-    if (sum_numbers % 10 == 0):
+     # we initialize the variable we will use during the iteration
+    digits_sum = 0 
+
+    #we use enumerate to get the count of the current iteration and the value of the item at the current iteration. Reversed is used to reverse the card_number since we are supposed to start from the end
+    for i, digit in enumerate(reversed(card_number)): 
+        #we make sure digit is an int 
+        j = int(digit)  
+        # we use the modulus operator to see if the number is dividable by 2
+        if i % 2 == 0: 
+            # if so we add it to the sum
+            digits_sum += j 
+        elif j >= 5: 
+            # for the last numbers we multiply them by 2 and we subtract 9
+            digits_sum += j * 2 - 9
+        else: 
+            # for the rest we just multiply them by 2
+            digits_sum += j * 2
+    # if the final sum is dividable by 10 we return true because the card number is valid 
+    if  digits_sum % 10 == 0: 
         return True
     else:
         return False
+
+
 
 # we ask the user about his/her details, we should add a check to know if the user is a company or a client
 
