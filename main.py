@@ -100,17 +100,18 @@ if logged_in == 1:
         quote_client_id = input('Please type your client id:')
         quote_quantity = input('Please choose the quantity:')
         quote_price_id = input('Please specify the price_id:')
-        cursor.execute('SELECT subscriptions_id, name FROM Subscriptions')
+        cursor.execute('SELECT subscription_id, name FROM Subscriptions')
         print(cursor.fetchall())
         quote_subscriptions_list = input('Please list the subscriptions ids, if you want to create a new subscription please type "New":')
         if quote_subscriptions_list == "New":
-            new_subscription_name = input("Please choose a name for your subscription")
-            new_subscription_amount = int(input("Please enter the amount:"))
-            new_subscription_currency = input("Please specify the currency:")
+            new_subscription_name = input("Please choose a name for your subscription: ")
+            new_subscription_amount = int(input("Please enter the amount: "))
+            new_subscription_currency = input("Please specify the currency: ")
             #first we add a row into the Prices table
+            #at the moment we don't have the currency convertion module
             cursor.execute('''
-                INSERT INTO TABLE Prices(amount, currency)
-                VALUES(?,?)''', (new_subscription_amount,new_subscription_currency))
+                INSERT INTO Prices(amount, currency,amount_euro)
+                VALUES(?,?,?)''', (new_subscription_amount,new_subscription_currency,new_subscription_amount))
             #we get the row id we just created
             new_price_id = int(cursor.lastrowid)
             #we now create a new row into subscriptions
