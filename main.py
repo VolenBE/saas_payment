@@ -100,7 +100,17 @@ if logged_in == 1:
         quote_client_id = input('Please type your client id:')
         quote_quantity = input('Please choose the quantity:')
         quote_price_id = input('Please specify the price_id:')
-        quote_subscriptions_list = input('Please list the subscriptions:')
+        cursor.execute('SELECT subscriptions_id, name FROM Subscriptions')
+        print(cursor.fetchall())
+        quote_subscriptions_list = input('Please list the subscriptions ids, if you want to create a new subscription please type "New":')
+        if quote_subscriptions_list == "New":
+            new_subscription_name = input("Please choose a name for your subscription")
+            new_subscription_amount = int(input("Please enter the amount:"))
+            new_subscription_currency = input("Please specify the currency:")
+            cursor.execute('''
+                INSERT INTO TABLE Prices(amount, currency)
+                VALUES(?,?)''', (new_subscription_amount,new_subscription_currency))
+
         quote_accepted = 0
         cursor.execute('''
             INSERT INTO Quotes(company_id, client_id, quantity, price_id, subscriptions_list, accepted)
