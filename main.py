@@ -141,10 +141,6 @@ if logged_in == 1:
 else:
     exit()
 
-    #we have an issue because we can't make a match between a subscription and a price id,
-    #we should find a way to define a subscription and it's price beforehand so we can fill it in actions 3
-    #because at the moment we are stuck with a quote price and not even being able to calculate it
-    #we must first oblige companies to create a list of the subscriptions and their prices
 
 
 
