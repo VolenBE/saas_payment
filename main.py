@@ -107,10 +107,16 @@ if logged_in == 1:
             new_subscription_name = input("Please choose a name for your subscription")
             new_subscription_amount = int(input("Please enter the amount:"))
             new_subscription_currency = input("Please specify the currency:")
+            #first we add a row into the Prices table
             cursor.execute('''
                 INSERT INTO TABLE Prices(amount, currency)
                 VALUES(?,?)''', (new_subscription_amount,new_subscription_currency))
-
+            #we get the row id we just created
+            new_price_id = int(cursor.lastrowid)
+            #we now create a new row into subscriptions
+            cursor.execute('''
+                INSERT INTO Subscriptions(name, active, price_id)
+                VALUES(?,?,?)''', (new_subscription_name, 0, new_price_id))
         quote_accepted = 0
         cursor.execute('''
             INSERT INTO Quotes(company_id, client_id, quantity, price_id, subscriptions_list, accepted)
@@ -120,7 +126,7 @@ if logged_in == 1:
         cursor.execute('SELECT accepted FROM Quotes WHERE quote_id = ?', (quote_tobechecked,))
         quote_status = cursor.fetchone()
         cursor.execute('SELECT subscriptions_list FROM Quotes WHERE quote_id = ?', (quote_tobechecked,))
-        subscriptions_list = cursor.fetchone()
+        subscriptions_list = cursor.fetchall()
         if quote_status[0] == 1:
             print("Your quote has been accepted by your client we're going to turn it into an active subscription")
             for subscriptions in subscriptions_list:
