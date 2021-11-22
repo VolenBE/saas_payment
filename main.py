@@ -49,6 +49,9 @@ cursor.execute('SELECT * FROM Users WHERE username = ? AND password = ?', (usern
 if cursor.fetchall():
     print('Welcome', username) # if there is a matching record we welcome the user
     logged_in = 1
+    cursor.execute('SELECT ID FROM Users WHERE username = ?', (username,)) # we get the id of the client 
+    logged_id = cursor.fetchone()
+    print(logged_id[0])
 else:
     print("Sorry it seems we can't find you in our database") #if there is no matching record we tell the user
     register = int(input("Would you like to register? If so please type 1"))
@@ -94,7 +97,14 @@ if logged_in == 1:
             VALUES(?)''', (sclient_id))
         print("Client added to the clients ids list")
     elif actions == 2:
-        print('2')
+        quote_client_id = input('Please type your client id:')
+        quote_quantity = input('Please choose the quantity:')
+        quote_price_id = input('Please specify the price_id:')
+        quote_subscriptions_list = input('Please list the subscriptions:')
+        quote_accepted = 0
+        cursor.execute('''
+            INSERT INTO Quotes(company_id, client_id, quantity, price_id, subscriptions_list, accepted)
+            VALUES(?,?,?,?,?,?)''', (logged_id[0], quote_client_id, quote_quantity, quote_price_id, quote_subscriptions_list, quote_accepted))
     elif actions == 3:
         print('3')
     elif actions == 4:
