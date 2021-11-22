@@ -106,7 +106,13 @@ if logged_in == 1:
             INSERT INTO Quotes(company_id, client_id, quantity, price_id, subscriptions_list, accepted)
             VALUES(?,?,?,?,?,?)''', (logged_id[0], quote_client_id, quote_quantity, quote_price_id, quote_subscriptions_list, quote_accepted))
     elif actions == 3:
-        print('3')
+        quote_tobechecked = input('Which quote would you like to check?')
+        cursor.execute('SELECT accepted FROM Quotes WHERE quote_id = ?', (quote_tobechecked))
+        quote_status = cursor.fetchone()
+        if quote_status[0] == 1:
+            print("Your quote has been accepted by your client we're going to turn it into an active subscription")
+        else:
+            print("Your quote hasn't been accepted by your client yet")
     elif actions == 4:
         print('4')
 else:
