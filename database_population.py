@@ -48,7 +48,7 @@ def create_subscriptions(amount, currency, name):
     cursor.execute('''
         INSERT INTO Subscriptions(name, active, price_id)
         VALUES(?,?,?)''', (name, 0, new_price_id))
-create_subscriptions(12, 'USD', 'paypal')
+create_subscriptions(16, 'USD', 'spotify')
 def get_rates():
     url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
     data = urllib.request.urlopen(url).read().decode()
