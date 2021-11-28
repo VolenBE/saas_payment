@@ -1,5 +1,7 @@
 import sqlite3
+import requests
 import json
+import urllib.request
 
 dbase = sqlite3.connect('database.db', isolation_level=None)
 cursor = dbase.cursor()
@@ -42,3 +44,23 @@ def create_subscriptions(amount, currency, name):
     cursor.execute('''
         INSERT INTO Subscriptions(name, active, price_id)
         VALUES(?,?,?)''', (name, 0, new_price_id))
+def get_rates():
+    url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
+    data = urllib.request.urlopen(url).read().decode()
+    
+    obj = json.loads(data)
+
+    for currency, rate in obj['conversion_rates'].items():
+        cursor.execute('INSERT INTO Currencies(name,rate) VALUES(?,?)', (currency, rate))
+
+def update_rates():
+    url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
+    data = urllib.request.urlopen(url).read().decode()
+    
+    obj = json.loads(data)
+
+    for currency, rate in obj['conversion_rates'].items():
+        cursor.execute('UPDATE Currencies SET rate=? WHERE name=?', (rate, currency))
+
+
+update_rates()

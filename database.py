@@ -103,10 +103,21 @@ dbase.execute(''' CREATE TABLE IF NOT EXISTS Subscriptions
     )''')
 print("Table Invoices created successfully")
 
-dbase.execute(''' 
-                INSERT INTO Users(username,password,bankaccount,address)
-                VALUES('antoine','antoine',1023891,'avenue louise 12')
+# Currencies
+
+dbase.execute('''CREATE TABLE IF NOT EXISTS Currencies
+    (
+        currency_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        name TEXT NOT NULL,
+        rate INT NOT NULL
+    )
 ''')
+
+
+#dbase.execute(''' 
+#                INSERT INTO Users(username,password,bankaccount,address)
+#                VALUES('antoine','antoine',1023891,'avenue louise 12')
+#''')
 
 dbase.close()
 print('Database Closed')
