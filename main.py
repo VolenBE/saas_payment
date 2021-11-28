@@ -1,10 +1,15 @@
 import sqlite3
-import getpass # might be useless in this case
 import json
+import requests
+from fastapi import FastAPI, Request
+import uvicorn
 
-# Initialize variables
+app = FastAPI()
 
-logged_in = 0
+@app.get("/")
+def root():
+  return {"message": "It works !"}
+
 
 # Functions
 
@@ -32,114 +37,55 @@ def checkCard(card_number):
     else:
         return False
 
+# First API request : Quote creation
 
+@app.post("/quote_creation")
+async def quote_creation(payload: Request):
+    values_dict = await payload.json()
+    # Open the DB
+    dbase = sqlite3.connect('database.db', isolation_level=None)
+    cursor = dbase.cursor()
+    # Step 1: we create the query
 
-# we ask the user about his/her details, we should add a check to know if the user is a company or a client
+    creation_query = cursor.execute('''
+                    INSERT INTO Quotes(company_id,client_id,quantity,price_id,subscriptions_list,accepted)
+                    VALUES({company_id},{client_id},{quantity},{price_id},{subscriptions_list},{accepted})
 
-username = input('Your username:')
-userpass = getpass.getpass('Your password:')
+    ''')
 
-# Establish a connection to the database
+    return True
 
-dbase = sqlite3.connect('database.db', isolation_level=None)
-cursor = dbase.cursor()
+def get_rates():
+    request = requests.get('https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR')
+    print(request.json()['conversion_rates'])
 
-cursor.execute('SELECT * FROM Users WHERE username = ? AND password = ?', (username, userpass)) # we make a sql request to see if there is a matching record
+print(get_rates())
 
-if cursor.fetchall():
-    print('Welcome', username) # if there is a matching record we welcome the user
-    logged_in = 1
-    cursor.execute('SELECT ID FROM Users WHERE username = ?', (username,)) # we get the id of the client 
-    logged_id = cursor.fetchone()
-    print(logged_id[0])
-else:
-    print("Sorry it seems we can't find you in our database") #if there is no matching record we tell the user
-    register = int(input("Would you like to register? If so please type 1"))
-    if register == 1:
-        wanted_username = input('Please choose a username:')
-        wanted_password = input('Please choose a password:')
-        bankaccount = input('Bank account:')
-        address = input('Address:')
-        vatid = input('Your vat id:')
-        company_name = input('Your company name:')
-        cursor.execute(''' 
-            INSERT INTO Users(username,password,bankaccount,address)
-            VALUES(?,?,?,?)''', (wanted_username, wanted_password, bankaccount, address))
-        print("Account successfully created")
-        company_id = int(cursor.lastrowid)
-        print(company_id)
-        cursor.execute('''
-            INSERT INTO Companies(company_id, vatid, company_name)
-            VALUES(?,?,?,?)''', (company_id, vatid, company_name))
-    else:
-        print('Bye bye')
+@app.post("/accepting_quote")
+async def accepting_quote():
+  # We will put here the code to execute
+  return True
 
-if logged_in == 1:
-    actions = int(input("Please tell us what would you like to do: \n Type 1 to register a new Customer \n Type 2 to create a quote \n Type 3 to convert a quote into a subscription \n Type 4 to retrieve statistics"))
-    if actions == 1:
-        customer_username = input('Please choose a username for your customer:')
-        customer_password = input('Please choose a password for your customer:')
-        customer_bankaccount = input('Please provide your customer bank account number:')
-        customer_address = input('Please provide your customer address:')
-        cursor.execute(''' 
-            INSERT INTO Users(username,password,bankaccount,address)
-            VALUES(?,?,?,?)''', (customer_username, customer_password, customer_bankaccount, customer_address))
-        print("Customer account successfully created")
-        client_id = int(cursor.lastrowid)
-        print(client_id)
-        cursor.execute(''' 
-            INSERT INTO Clients(client_id)
-            VALUES(?)''', (client_id,))
-        print("Client id added to the Clients table")
-        sclient_id = json.dumps(client_id)
-        cursor.execute('''
-            INSERT INTO Companies(client_ids_list)
-            VALUES(?)''', (sclient_id))
-        print("Client added to the clients ids list")
-    elif actions == 2:
-        quote_client_id = input('Please type your client id:')
-        quote_quantity = input('Please choose the quantity:')
-        quote_price_id = input('Please specify the price_id:')
-        cursor.execute('SELECT subscription_id, name FROM Subscriptions')
-        print(cursor.fetchall())
-        quote_subscriptions_list = input('Please list the subscriptions ids, if you want to create a new subscription please type "New":')
-        if quote_subscriptions_list == "New":
-            new_subscription_name = input("Please choose a name for your subscription: ")
-            new_subscription_amount = int(input("Please enter the amount: "))
-            new_subscription_currency = input("Please specify the currency: ")
-            #first we add a row into the Prices table
-            #at the moment we don't have the currency convertion module
-            cursor.execute('''
-                INSERT INTO Prices(amount, currency,amount_euro)
-                VALUES(?,?,?)''', (new_subscription_amount,new_subscription_currency,new_subscription_amount))
-            #we get the row id we just created
-            new_price_id = int(cursor.lastrowid)
-            #we now create a new row into subscriptions
-            cursor.execute('''
-                INSERT INTO Subscriptions(name, active, price_id)
-                VALUES(?,?,?)''', (new_subscription_name, 0, new_price_id))
-        quote_accepted = 0
-        cursor.execute('''
-            INSERT INTO Quotes(company_id, client_id, quantity, price_id, subscriptions_list, accepted)
-            VALUES(?,?,?,?,?,?)''', (logged_id[0], quote_client_id, quote_quantity, quote_price_id, quote_subscriptions_list, quote_accepted))
-    elif actions == 3:
-        quote_tobechecked = input('Which quote would you like to check?')
-        cursor.execute('SELECT accepted FROM Quotes WHERE quote_id = ?', (quote_tobechecked,))
-        quote_status = cursor.fetchone()
-        cursor.execute('SELECT subscriptions_list FROM Quotes WHERE quote_id = ?', (quote_tobechecked,))
-        subscriptions_list = cursor.fetchall()
-        if quote_status[0] == 1:
-            print("Your quote has been accepted by your client we're going to turn it into an active subscription")
-            for subscriptions in subscriptions_list:
-                cursor.execute('''
-                INSERT INTO Subscriptions(name, active)
-                VALUES(?,?)''', (subscriptions, 1))
-        else:
-            print("Your quote hasn't been accepted by your client yet")
-    elif actions == 4:
-        print('4')
-else:
-    exit()
+@app.post("/convert_quote")
+async def convert_quote():
+  # We will put here the code to execute
+  return True
+
+@app.post("/invoice")
+async def invoice():
+  # We will put here the code to execute
+  return True
+
+@app.post("/pay_invoice")
+async def pay_invoice():
+  # We will put here the code to execute
+  return True
+
+@app.post("/retrieve_stats")
+async def retrieve_stats():
+  # We will put here the code to execute
+  return True
+
 
 
 
