@@ -55,12 +55,6 @@ async def quote_creation(payload: Request):
 
     return True
 
-def get_rates():
-    request = requests.get('https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR')
-    print(request.json()['conversion_rates'])
-
-print(get_rates())
-
 @app.post("/accepting_quote")
 async def accepting_quote():
   # We will put here the code to execute
