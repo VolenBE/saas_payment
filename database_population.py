@@ -34,7 +34,11 @@ def create_company(username, password, bankaccount, address, vatid, company_name
         VALUES(?,?,?,?)''', (company_id, vatid, company_name))
 
 def create_subscriptions(amount, currency, name):
-    amount_euro = amount / currency
+    cursor.execute('SELECT rate FROM Currencies WHERE name=?', [currency])
+    rate = float(cursor.fetchone()[0])
+    print(rate)
+    amount_euro = amount / rate
+    print(amount_euro)
     cursor.execute('''
         INSERT INTO Prices(amount, currency,amount_euro)
         VALUES(?,?,?)''', (amount,currency,amount_euro))
@@ -44,6 +48,7 @@ def create_subscriptions(amount, currency, name):
     cursor.execute('''
         INSERT INTO Subscriptions(name, active, price_id)
         VALUES(?,?,?)''', (name, 0, new_price_id))
+create_subscriptions(12, 'USD', 'paypal')
 def get_rates():
     url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
     data = urllib.request.urlopen(url).read().decode()
@@ -61,6 +66,3 @@ def update_rates():
 
     for currency, rate in obj['conversion_rates'].items():
         cursor.execute('UPDATE Currencies SET rate=? WHERE name=?', (rate, currency))
-
-
-update_rates()
