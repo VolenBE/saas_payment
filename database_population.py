@@ -17,7 +17,9 @@ def get_company_names():
     for i in range(len(content)):
         company_names.append(content[i].splitlines())
     file.close()
-    return random.choice(company_names)
+    chosen = random.choice(company_names)
+    company_names.remove(chosen)
+    return chosen
 def random_username():
     usernames = []
     file = open('usernames.txt', 'r')
@@ -26,7 +28,9 @@ def random_username():
     for i in range(len(content)):
         usernames.append(content[i].splitlines())
     file.close()
-    return random.choice(usernames)
+    chosen = random.choice(usernames)
+    usernames.remove(chosen)
+    return chosen
 
 def random_password(longueur):
     letters = ['A','B','D','e','F','z','m','i']
@@ -48,6 +52,12 @@ def random_address():
     all = str(random.choice(range(1,100))) + ' rue ' + random.choice(rue) + ', ' + random.choice(ville)
     return all
 
+def select_random_companyid():
+    #we use the ORDER BY RANDOM() to avoid writing python for this
+    cursor.execute('SELECT company_id FROM Companies ORDER BY RANDOM() LIMIT 1')
+    chosen_companyid = cursor.fetchone()[0]
+    return chosen_companyid
+
 # function create company
 
 def create_company(username, password, bankaccount, address, vatid, company_name):
@@ -68,22 +78,21 @@ def populate_companies():
         name =  "".join(get_company_names())
         create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
         i = i + 1
-
 # function create client
 
 def create_client(company_id, username, password, bankaccount, address):
-
     cursor.execute(''' 
         INSERT INTO Users(username,password,bankaccount,address)
         VALUES(?,?,?,?)''', (username, password, bankaccount, address))
     print("Customer account successfully created")
     client_id = int(cursor.lastrowid)
     print(client_id)
-    cursor.execute(''' 
+    cursor.execute('''
         INSERT INTO Clients(client_id)
         VALUES(?)''', (client_id,))
     print("Client id added to the Clients table")
     sclient_id = json.dumps(client_id)
+    sclient_id = str(sclient_id)
     cursor.execute('UPDATE Companies set client_ids_list='+ sclient_id +' WHERE ID=' + company_id)
     print("Client added to the clients ids list")
 
@@ -92,9 +101,9 @@ def populate_clients():
     username = "".join(random_username())
     for i in range(1, 15):
         i=1
-        create_client('',username, random_password(8), random_number(),random_address)
+        create_client(select_random_companyid(), username, random_password(8), random_number(),random_address())
         i=i+1
-
+populate_clients()
 
 def create_subscriptions(amount, currency, name):
     cursor.execute('SELECT rate FROM Currencies WHERE name=?', [currency])
