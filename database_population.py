@@ -78,6 +78,8 @@ def populate_companies():
         name =  "".join(get_company_names())
         create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
         i = i + 1
+
+populate_companies()
 # function create client
 
 def create_client(company_id, username, password, bankaccount, address):
@@ -88,13 +90,9 @@ def create_client(company_id, username, password, bankaccount, address):
     client_id = int(cursor.lastrowid)
     print(client_id)
     cursor.execute('''
-        INSERT INTO Clients(client_id)
-        VALUES(?)''', (client_id,))
+        INSERT INTO Clients(client_id, company_id)
+        VALUES(?,?)''', (client_id,company_id))
     print("Client id added to the Clients table")
-    sclient_id = json.dumps(client_id)
-    sclient_id = str(sclient_id)
-    cursor.execute('UPDATE Companies set client_ids_list='+ sclient_id +' WHERE ID=' + company_id)
-    print("Client added to the clients ids list")
 
 #populate clients
 def populate_clients():
