@@ -56,19 +56,18 @@ def create_company(username, password, bankaccount, address, vatid, company_name
             VALUES(?,?,?,?)''', (username, password, bankaccount, address))
     print("Account successfully created")
     company_id = int(cursor.lastrowid)
-    print(company_id)
     cursor.execute('''
         INSERT INTO Companies(company_id, vatid, company_name)
         VALUES(?,?,?)''', (company_id, vatid, company_name))
 
 # populate company table
-
-for i in range(1, 15):
-    i = 0
-    username = "".join(random_username())
-    name =  "".join(get_company_names())
-    create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
-    i = i + 1
+def populate_companies():
+    for i in range(1, 15):
+        i = 0
+        username = "".join(random_username())
+        name =  "".join(get_company_names())
+        create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
+        i = i + 1
 
 # function create client
 
@@ -89,8 +88,12 @@ def create_client(company_id, username, password, bankaccount, address):
     print("Client added to the clients ids list")
 
 #populate clients
-
-#create_client('')
+def populate_clients():
+    username = "".join(random_username())
+    for i in range(1, 15):
+        i=0
+        create_client('',username, random_password(8), random_number(),random_address)
+        i=i+1
 
 
 def create_subscriptions(amount, currency, name):
