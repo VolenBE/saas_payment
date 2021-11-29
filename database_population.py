@@ -2,9 +2,75 @@ import sqlite3
 import requests
 import json
 import urllib.request
+import random
 
 dbase = sqlite3.connect('database.db', isolation_level=None)
 cursor = dbase.cursor()
+
+# A few functions to generate random elements
+
+def get_company_names():
+    company_names = []
+    file = open('company_names.txt', 'r')
+    content = file.readlines()
+
+    for i in range(len(content)):
+        company_names.append(content[i].splitlines())
+    file.close()
+    return random.choice(company_names)
+def random_username():
+    usernames = []
+    file = open('usernames.txt', 'r')
+    content = file.readlines()
+
+    for i in range(len(content)):
+        usernames.append(content[i].splitlines())
+    file.close()
+    return random.choice(usernames)
+
+def random_password(longueur):
+    letters = ['A','B','D','e','F','z','m','i']
+    numbers = ['1','2','3','4','5','6','7','8','9']
+    all = letters + numbers
+    temp = random.sample(all,longueur)
+    password = "".join(temp)
+    return password
+
+def random_number():
+    numbers = ['0','1','2','3','4','5','6','7','8','9']
+    temp = random.sample(numbers, 8)
+    bankaccount = "".join(temp)
+    return bankaccount
+
+def random_address():
+    rue = ['des Marroniers', 'de la Thyria', 'Neuve', 'Roosevelt', 'des Monthys']
+    ville = ['Bruxelles', 'Namur', 'Liège', 'Charleroi']
+    all = str(random.choice(range(1,100))) + ' rue ' + random.choice(rue) + ', ' + random.choice(ville)
+    return all
+
+# function create company
+
+def create_company(username, password, bankaccount, address, vatid, company_name):
+    cursor.execute(''' 
+            INSERT INTO Users(username,password,bankaccount,address)
+            VALUES(?,?,?,?)''', (username, password, bankaccount, address))
+    print("Account successfully created")
+    company_id = int(cursor.lastrowid)
+    print(company_id)
+    cursor.execute('''
+        INSERT INTO Companies(company_id, vatid, company_name)
+        VALUES(?,?,?)''', (company_id, vatid, company_name))
+
+# populate company table
+
+for i in range(1, 15):
+    i = 0
+    username = "".join(random_username())
+    name =  "".join(get_company_names())
+    create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
+    i = i + 1
+
+# function create client
 
 def create_client(company_id, username, password, bankaccount, address):
 
@@ -22,16 +88,10 @@ def create_client(company_id, username, password, bankaccount, address):
     cursor.execute('UPDATE Companies set client_ids_list='+ sclient_id +' WHERE ID=' + company_id)
     print("Client added to the clients ids list")
 
-def create_company(username, password, bankaccount, address, vatid, company_name):
-    cursor.execute(''' 
-            INSERT INTO Users(username,password,bankaccount,address)
-            VALUES(?,?,?,?)''', (username, password, bankaccount, address))
-    print("Account successfully created")
-    company_id = int(cursor.lastrowid)
-    print(company_id)
-    cursor.execute('''
-        INSERT INTO Companies(company_id, vatid, company_name)
-        VALUES(?,?,?,?)''', (company_id, vatid, company_name))
+#populate clients
+
+#create_client('')
+
 
 def create_subscriptions(amount, currency, name):
     cursor.execute('SELECT rate FROM Currencies WHERE name=?', [currency])
@@ -48,7 +108,7 @@ def create_subscriptions(amount, currency, name):
     cursor.execute('''
         INSERT INTO Subscriptions(name, active, price_id)
         VALUES(?,?,?)''', (name, 0, new_price_id))
-create_subscriptions(16, 'USD', 'spotify')
+#create_subscriptions(16, 'USD', 'spotify')
 def get_rates():
     url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
     data = urllib.request.urlopen(url).read().decode()
