@@ -63,7 +63,7 @@ def create_company(username, password, bankaccount, address, vatid, company_name
 # populate company table
 def populate_companies():
     for i in range(1, 15):
-        i = 0
+        i = 1
         username = "".join(random_username())
         name =  "".join(get_company_names())
         create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
@@ -91,7 +91,7 @@ def create_client(company_id, username, password, bankaccount, address):
 def populate_clients():
     username = "".join(random_username())
     for i in range(1, 15):
-        i=0
+        i=1
         create_client('',username, random_password(8), random_number(),random_address)
         i=i+1
 
