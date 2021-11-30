@@ -136,7 +136,7 @@ def populate_subscriptions():
         i=1
         create_subscriptions(random_price(), random_currency(), random_company_name())
         i=i+1
-populate_subscriptions()
+
 def get_rates():
     url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
     data = urllib.request.urlopen(url).read().decode()
