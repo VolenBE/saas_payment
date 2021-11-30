@@ -1,5 +1,4 @@
 import sqlite3
-import requests
 import json
 import urllib.request
 import random
@@ -46,6 +45,20 @@ def random_number():
     bankaccount = "".join(temp)
     return bankaccount
 
+def random_price():
+    random_price = random.randint(5,100)
+    return random_price
+
+def random_currency():
+    cursor.execute('SELECT name FROM Currencies ORDER BY RANDOM() LIMIT 1')
+    random_currency = cursor.fetchone()[0]
+    return random_currency
+
+def random_company_name():
+    cursor.execute('SELECT company_name FROM Companies ORDER BY RANDOM() LIMIT 1')
+    random_company_name = cursor.fetchone()[0]
+    return random_company_name
+
 def random_address():
     rue = ['des Marroniers', 'de la Thyria', 'Neuve', 'Roosevelt', 'des Monthys']
     ville = ['Bruxelles', 'Namur', 'Liège', 'Charleroi']
@@ -53,7 +66,7 @@ def random_address():
     return all
 
 def select_random_companyid():
-    #we use the ORDER BY RANDOM() to avoid writing python for this
+    #we use the ORDER BY RANDOM() to get a random element from the table
     cursor.execute('SELECT company_id FROM Companies ORDER BY RANDOM() LIMIT 1')
     chosen_companyid = cursor.fetchone()[0]
     return chosen_companyid
@@ -79,7 +92,7 @@ def populate_companies():
         create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
         i = i + 1
 
-populate_companies()
+
 # function create client
 
 def create_client(company_id, username, password, bankaccount, address):
@@ -101,7 +114,6 @@ def populate_clients():
         i=1
         create_client(select_random_companyid(), username, random_password(8), random_number(),random_address())
         i=i+1
-populate_clients()
 
 def create_subscriptions(amount, currency, name):
     cursor.execute('SELECT rate FROM Currencies WHERE name=?', [currency])
@@ -118,7 +130,13 @@ def create_subscriptions(amount, currency, name):
     cursor.execute('''
         INSERT INTO Subscriptions(name, active, price_id)
         VALUES(?,?,?)''', (name, 0, new_price_id))
-#create_subscriptions(16, 'USD', 'spotify')
+
+def populate_subscriptions():
+    for i in range(1, 15):
+        i=1
+        create_subscriptions(random_price(), random_currency(), random_company_name())
+        i=i+1
+populate_subscriptions()
 def get_rates():
     url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
     data = urllib.request.urlopen(url).read().decode()
@@ -127,7 +145,6 @@ def get_rates():
 
     for currency, rate in obj['conversion_rates'].items():
         cursor.execute('INSERT INTO Currencies(name,rate) VALUES(?,?)', (currency, rate))
-
 def update_rates():
     url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
     data = urllib.request.urlopen(url).read().decode()

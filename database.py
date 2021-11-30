@@ -32,7 +32,6 @@ print("Table Companies created successfully")
 dbase.execute(''' CREATE TABLE IF NOT EXISTS Clients
     (
         client_id INT NOT NULL,
-        invoice_ids_list VARCHAR,
         company_id INT NOT NULL,
         FOREIGN KEY (company_id) REFERENCES Companies(company_id),
         FOREIGN KEY (client_id) REFERENCES Users(id)

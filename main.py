@@ -1,6 +1,5 @@
 import sqlite3
 import json
-import requests
 from fastapi import FastAPI, Request
 import uvicorn
 
@@ -45,12 +44,12 @@ async def quote_creation(payload: Request):
     # Open the DB
     dbase = sqlite3.connect('database.db', isolation_level=None)
     cursor = dbase.cursor()
-    # Step 1: we create the query
+    
+    
 
     creation_query = cursor.execute('''
-                    INSERT INTO Quotes(company_id,client_id,quantity,price_id,subscriptions_list,accepted)
-                    VALUES({company_id},{client_id},{quantity},{price_id},{subscriptions_list},{accepted})
-
+      INSERT INTO Quotes(company_id,client_id,quantity,price_id,subscriptions_list,accepted)
+      VALUES({company_id},{client_id},{quantity},{price_id},{subscriptions_list},{accepted})
     ''')
 
     return True
