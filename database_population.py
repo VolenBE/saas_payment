@@ -6,8 +6,6 @@ import random
 dbase = sqlite3.connect('database.db', isolation_level=None)
 cursor = dbase.cursor()
 
-# A few functions to generate random elements
-
 def get_company_names():
     company_names = []
     file = open('company_names.txt', 'r')
@@ -19,6 +17,7 @@ def get_company_names():
     chosen = random.choice(company_names)
     company_names.remove(chosen)
     return chosen
+
 def random_username():
     usernames = []
     file = open('usernames.txt', 'r')
@@ -71,8 +70,6 @@ def select_random_companyid():
     chosen_companyid = cursor.fetchone()[0]
     return chosen_companyid
 
-# function create company
-
 def create_company(username, password, bankaccount, address, vatid, company_name):
     cursor.execute(''' 
             INSERT INTO Users(username,password,bankaccount,address)
@@ -83,7 +80,6 @@ def create_company(username, password, bankaccount, address, vatid, company_name
         INSERT INTO Companies(company_id, vatid, company_name)
         VALUES(?,?,?)''', (company_id, vatid, company_name))
 
-# populate company table
 def populate_companies():
     for i in range(1, 15):
         i = 1
@@ -91,9 +87,6 @@ def populate_companies():
         name =  "".join(get_company_names())
         create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
         i = i + 1
-
-
-# function create client
 
 def create_client(company_id, username, password, bankaccount, address):
     cursor.execute(''' 
@@ -107,7 +100,6 @@ def create_client(company_id, username, password, bankaccount, address):
         VALUES(?,?)''', (client_id,company_id))
     print("Client id added to the Clients table")
 
-#populate clients
 def populate_clients():
     username = "".join(random_username())
     for i in range(1, 15):
@@ -145,6 +137,7 @@ def get_rates():
 
     for currency, rate in obj['conversion_rates'].items():
         cursor.execute('INSERT INTO Currencies(name,rate) VALUES(?,?)', (currency, rate))
+
 def update_rates():
     url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
     data = urllib.request.urlopen(url).read().decode()
