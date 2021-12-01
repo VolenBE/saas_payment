@@ -45,8 +45,6 @@ async def quote_creation(payload: Request):
     dbase = sqlite3.connect('database.db', isolation_level=None)
     cursor = dbase.cursor()
     
-    
-
     creation_query = cursor.execute('''
       INSERT INTO Quotes(company_id,client_id,quantity,price_id,subscriptions_list,accepted)
       VALUES({company_id},{client_id},{quantity},{price_id},{subscriptions_list},{accepted})
@@ -54,25 +52,35 @@ async def quote_creation(payload: Request):
 
     return True
 
+# Second API request : Quote acceptation from the client
+
 @app.post("/accepting_quote")
 async def accepting_quote():
   # We will put here the code to execute
   return True
+
+# Third API request : Quote convertion from the Company
 
 @app.post("/convert_quote")
 async def convert_quote():
   # We will put here the code to execute
   return True
 
+# Fourth API request : Check if there is a pending invoice
+
 @app.post("/invoice")
 async def invoice():
   # We will put here the code to execute
   return True
 
+# Fifth API request : Pay invoice using credit card number
+
 @app.post("/pay_invoice")
 async def pay_invoice():
   # We will put here the code to execute
   return True
+
+# Sixth API request : Company retrieve their stats
 
 @app.post("/retrieve_stats")
 async def retrieve_stats():

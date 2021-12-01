@@ -65,7 +65,6 @@ def random_address():
     return all
 
 def select_random_companyid():
-    #we use the ORDER BY RANDOM() to get a random element from the table
     cursor.execute('SELECT company_id FROM Companies ORDER BY RANDOM() LIMIT 1')
     chosen_companyid = cursor.fetchone()[0]
     return chosen_companyid
@@ -116,9 +115,7 @@ def create_subscriptions(amount, currency, name):
     cursor.execute('''
         INSERT INTO Prices(amount, currency,amount_euro)
         VALUES(?,?,?)''', (amount,currency,amount_euro))
-    #we get the row id we just created
     new_price_id = int(cursor.lastrowid)
-    #we now create a new row into subscriptions
     cursor.execute('''
         INSERT INTO Subscriptions(name, active, price_id)
         VALUES(?,?,?)''', (name, 0, new_price_id))

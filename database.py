@@ -112,6 +112,7 @@ dbase.execute('''CREATE TABLE IF NOT EXISTS Currencies
         rate INT NOT NULL
     )
 ''')
+print("Table Currencies created successfully")
 
 
 #dbase.execute(''' 
