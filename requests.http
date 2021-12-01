@@ -1,0 +1,11 @@
+POST http://127.0.0.1:8000/quote_creation HTTP/1.1
+Content-Type: application/json
+
+{
+    "company_id": "1",
+    "client_id": "1",
+    "quantity": "1",
+    "price_id": "1",
+    "subscriptions_list": "",
+    "accepted": "0"
+}
