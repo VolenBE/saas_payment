@@ -81,11 +81,10 @@ def create_company(username, password, bankaccount, address, vatid, company_name
 
 def populate_companies():
     for i in range(1, 15):
-        i = 1
         username = "".join(random_username())
         name =  "".join(get_company_names())
         create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
-        i = i + 1
+        i+=1
 
 def create_client(company_id, username, password, bankaccount, address):
     cursor.execute(''' 
@@ -102,9 +101,8 @@ def create_client(company_id, username, password, bankaccount, address):
 def populate_clients():
     username = "".join(random_username())
     for i in range(1, 15):
-        i=1
         create_client(select_random_companyid(), username, random_password(8), random_number(),random_address())
-        i=i+1
+        i+=1
 
 def create_subscriptions(amount, currency, name):
     cursor.execute('SELECT rate FROM Currencies WHERE name=?', [currency])
@@ -122,9 +120,26 @@ def create_subscriptions(amount, currency, name):
 
 def populate_subscriptions():
     for i in range(1, 15):
-        i=1
         create_subscriptions(random_price(), random_currency(), random_company_name())
-        i=i+1
+        i+=1
+
+def generate_quote_price():
+    total_amount = 0
+    currency = "EUR"
+    cursor.execute('SELECT name, price_id FROM Subscriptions ORDER BY RANDOM() LIMIT 3')
+    random_sub1 = cursor.fetchall()
+    print(random_sub1)
+    print(len(random_sub1))
+    for i in range(0,len(random_sub1)):
+        print(random_sub1[i][1])
+        cursor.execute('SELECT amount_euro FROM Prices WHERE price_id=?', [random_sub1[i][1]])
+        total_amount = total_amount + float(cursor.fetchone()[0])
+        return total_amount
+    print(total_amount)
+    cursor.execute('''
+        INSERT INTO Prices(amount, currency,amount_euro)
+        VALUES(?,?,?)''', (total_amount,currency,total_amount))
+generate_quote_price()
 
 def get_rates():
     url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
