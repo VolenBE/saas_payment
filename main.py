@@ -48,8 +48,7 @@ async def quote_creation(payload: Request):
     creation_query = cursor.execute('''
       INSERT INTO Quotes(company_id,client_id,quantity,price_id,subscriptions_list,accepted)
       VALUES({company_id},{client_id},{quantity},{price_id},{subscriptions_list},{accepted})
-    ''')
-
+    '''.format(company_id=int(values_dict['company_id']), client_id=int(values_dict['client_id'], quantity=int(values_dict['quantity']),price_id=int(values_dict['price_id']))))
     return True
 
 # Second API request : Quote acceptation from the client
@@ -68,7 +67,7 @@ async def convert_quote():
 
 # Fourth API request : Check if there is a pending invoice
 
-@app.post("/invoice")
+@app.get("/invoice")
 async def invoice():
   # We will put here the code to execute
   return True
@@ -82,7 +81,7 @@ async def pay_invoice():
 
 # Sixth API request : Company retrieve their stats
 
-@app.post("/retrieve_stats")
+@app.get("/retrieve_stats")
 async def retrieve_stats():
   # We will put here the code to execute
   return True
