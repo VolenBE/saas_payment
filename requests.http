@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
     "company_id": 1,
-    "client_id": 1,
+    "client_id": 16,
     "quantity": 1,
     "price_id": 15,
     "subscriptions_list": "['Liberty Wealth Planner', 'Balanced Fortune', 'Bonanza Produce Stores']",
