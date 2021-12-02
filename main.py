@@ -48,7 +48,7 @@ async def quote_creation(payload: Request):
     cursor.execute('''
       INSERT INTO Quotes(company_id,client_id,quantity,price_id,subscriptions_list,accepted)
       VALUES(?,?,?,?,?,?)
-    '''.format(company_id=int(values_dict['company_id']), client_id=int(values_dict['client_id']), quantity=int(values_dict['quantity']),price_id=int(values_dict['price_id']),subscriptions_list=values_dict['subscriptions_list'],accepted=int(values_dict['accepted'])))
+    '''.format(company_id=int(values_dict['company_id']),client_id=int(values_dict['client_id']),quantity=int(values_dict['quantity']),price_id=int(values_dict['price_id']),subscriptions_list=values_dict['subscriptions_list'],accepted=int(values_dict['accepted'])))
     return {"message": "Successfully created the quote !"}
 
 # Second API request : Quote acceptation from the client
@@ -83,8 +83,29 @@ async def accepting_quote(payload: Request):
 # Third API request : Quote convertion from the Company
 
 @app.post("/convert_quote")
-async def convert_quote():
-  # We will put here the code to execute
+async def convert_quote(payload: Request):
+  values_dict = await payload.json()
+  # Open the DB
+  dbase = sqlite3.connect('database.db', isolation_level=None)
+  cursor = dbase.cursor()
+
+  check_query = cursor.execute('''
+    SELECT client_id, accepted
+    FROM Quotes
+    WHERE quote_id={}
+  '''.format(str(values_dict['quote_id'])))
+
+  id_client = check_query.fetchall()[0]
+  status = check_query.fetchall()[1]
+
+  if id_client != values_dict['client_id'] or status != 1:
+    return "Error"
+  
+
+  cursor.execute('''
+    INSERT INTO Invoices(pending, client_id, quote_id)
+    VALUES(?,?,?)
+  ''')
   return True
 
 # Fourth API request : Check if there is a pending invoice
