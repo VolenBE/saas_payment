@@ -128,18 +128,14 @@ def generate_quote_price():
     currency = "EUR"
     cursor.execute('SELECT name, price_id FROM Subscriptions ORDER BY RANDOM() LIMIT 3')
     random_sub1 = cursor.fetchall()
-    print(random_sub1)
-    print(len(random_sub1))
     for i in range(0,len(random_sub1)):
         print(random_sub1[i][1])
+        print(i)
         cursor.execute('SELECT amount_euro FROM Prices WHERE price_id=?', [random_sub1[i][1]])
         total_amount = total_amount + float(cursor.fetchone()[0])
-        return total_amount
-    print(total_amount)
     cursor.execute('''
         INSERT INTO Prices(amount, currency,amount_euro)
         VALUES(?,?,?)''', (total_amount,currency,total_amount))
-generate_quote_price()
 
 def get_rates():
     url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'

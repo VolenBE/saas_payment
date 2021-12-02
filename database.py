@@ -86,7 +86,9 @@ dbase.execute(''' CREATE TABLE IF NOT EXISTS Invoices
     (
         invoice_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         pending BOOLEAN,
+        client_id INT NOT NULL,
         quote_id INT NOT NULL,
+        FOREIGN KEY (client_id) REFERENCES clients(client_id),
         FOREIGN KEY (quote_id) REFERENCES Quotes(quote_id)
     )''')
 print("Table Invoices created successfully")
