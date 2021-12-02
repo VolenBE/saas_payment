@@ -84,7 +84,6 @@ def populate_companies():
         username = "".join(random_username())
         name =  "".join(get_company_names())
         create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
-        i+=1
 
 def create_client(company_id, username, password, bankaccount, address):
     cursor.execute(''' 
@@ -102,7 +101,6 @@ def populate_clients():
     username = "".join(random_username())
     for i in range(1, 15):
         create_client(select_random_companyid(), username, random_password(8), random_number(),random_address())
-        i+=1
 
 def create_subscriptions(amount, currency, name):
     cursor.execute('SELECT rate FROM Currencies WHERE name=?', [currency])
