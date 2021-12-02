@@ -47,7 +47,7 @@ async def quote_creation(payload: Request):
     
     cursor.execute('''
       INSERT INTO Quotes(company_id,client_id,quantity,price_id,subscriptions_list,accepted)
-      VALUES(?,?,?,?,?,?)
+      VALUES({company_id},{client_id},{quantity},{price_id},{subscriptions_list},{accepted})
     '''.format(company_id=int(values_dict['company_id']),client_id=int(values_dict['client_id']),quantity=int(values_dict['quantity']),price_id=int(values_dict['price_id']),subscriptions_list=values_dict['subscriptions_list'],accepted=int(values_dict['accepted'])))
     return {"message": "Successfully created the quote !"}
 
