@@ -72,7 +72,7 @@ dbase.execute(''' CREATE TABLE IF NOT EXISTS Quotes
         client_id INT NOT NULL,
         quantity INT NOT NULL,
         price_id INT NOT NULL,
-        subscriptions_list VARCHAR,
+        subscriptions_list VARCHAR(248),
         accepted BOOLEAN,
         FOREIGN KEY (company_id) REFERENCES Companies(company_id),
         FOREIGN KEY (client_id) REFERENCES Clients(client_id),

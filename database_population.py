@@ -120,7 +120,7 @@ def populate_subscriptions():
     for i in range(1, 15):
         create_subscriptions(random_price(), random_currency(), random_company_name())
         i+=1
-
+populate_subscriptions()
 def generate_quote_price():
     total_amount = 0
     currency = "EUR"

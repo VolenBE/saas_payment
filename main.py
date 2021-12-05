@@ -36,6 +36,15 @@ def checkCard(card_number):
     else:
         return False
 
+#il faut faire une requete api pour chaque élément, ajout d'un client, d'une subscription, ...
+#update les rates à chaque calcul
+#AMR = argent reçu par mois par customers
+#changer le système, stocker le prix de chaque subscriptions en euros dans la bdd, lorsque l'on crée la quote on stocke le prix total
+#lorsque le customer paye l'invoice on stocke à ce moment là la currency utilisée et on convertit le prix en euro dans la monnaie choisie
+#faire en sorte que le statut de la invoice soit changé automatiquement le dernier jour du mois une fois
+#peut être stocker la dernier date de paiement genre if date = lastdayofthemonth && lastpaymentdate != lastdayofthemonth then:
+
+
 # First API request : Quote creation
 
 @app.post("/quote_creation")
@@ -47,8 +56,8 @@ async def quote_creation(payload: Request):
     
     cursor.execute('''
       INSERT INTO Quotes(company_id,client_id,quantity,price_id,subscriptions_list,accepted)
-      VALUES({company_id},{client_id},{quantity},{price_id},{subscriptions_list},{accepted})
-    '''.format(company_id=int(values_dict['company_id']),client_id=int(values_dict['client_id']),quantity=int(values_dict['quantity']),price_id=int(values_dict['price_id']),subscriptions_list=values_dict['subscriptions_list'],accepted=int(values_dict['accepted'])))
+      VALUES("{company_id}","{client_id}","{quantity}","{price_id}","{subscriptions}","{accepted}")
+    '''.format(company_id=int(values_dict['company_id']),client_id=int(values_dict['client_id']),quantity=int(values_dict['quantity']),price_id=int(values_dict['price_id']),subscriptions=str(values_dict["subscriptions"]),accepted=int(values_dict['accepted'])))
     return {"message": "Successfully created the quote !"}
 
 # Second API request : Quote acceptation from the client

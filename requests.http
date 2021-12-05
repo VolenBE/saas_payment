@@ -6,6 +6,6 @@ Content-Type: application/json
     "client_id": 16,
     "quantity": 1,
     "price_id": 15,
-    "subscriptions_list": "['Liberty Wealth Planner', 'Balanced Fortune', 'Bonanza Produce Stores']",
+    "subscriptions": "['Liberty Wealth Planner', 'Deuxieme', 'troisième']",
     "accepted": 0
 }
