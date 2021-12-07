@@ -54,14 +54,14 @@ print("Table Analytics created successfully")
 
 #Prices
 
-dbase.execute(''' CREATE TABLE IF NOT EXISTS Prices
-    (
-        price_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-        amount INT NOT NULL,
-        currency VARCHAR(64) NOT NULL,
-        amount_euro INT NOT NULL
-    )''')
-print("Table Prices created successfully")
+#dbase.execute(''' CREATE TABLE IF NOT EXISTS Prices
+    #(
+     #   price_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    #    amount INT NOT NULL,
+   #     currency VARCHAR(64) NOT NULL,
+  #      amount_euro INT NOT NULL
+ #   )''')
+#print("Table Prices created successfully")
 
 #Quotes
 
@@ -71,12 +71,11 @@ dbase.execute(''' CREATE TABLE IF NOT EXISTS Quotes
         company_id INT NOT NULL,
         client_id INT NOT NULL,
         quantity INT NOT NULL,
-        price_id INT NOT NULL,
         subscriptions_list VARCHAR(248),
+        price_eur INT NOT NULL,
         accepted BOOLEAN,
         FOREIGN KEY (company_id) REFERENCES Companies(company_id),
-        FOREIGN KEY (client_id) REFERENCES Clients(client_id),
-        FOREIGN KEY (price_id) REFERENCES Prices(price_id)
+        FOREIGN KEY (client_id) REFERENCES Clients(client_id)
     )''')
 print("Table Quotes created successfully")
 
@@ -93,6 +92,21 @@ dbase.execute(''' CREATE TABLE IF NOT EXISTS Invoices
     )''')
 print("Table Invoices created successfully")
 
+#Payments
+
+dbase.execute(''' CREATE TABLE IF NOT EXISTS Payments
+    (
+        payment_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        invoice_id INT NOT NULL,
+        amount_eur INT NOT NULL,
+        currency_id char(3) NOT NULL,
+        amount_currency INT NOT NULL,
+        success BOOLEAN NOT NULL,
+        FOREIGN KEY (invoice_id) REFERENCES Invoices(invoice_id),
+        FOREIGN KEY (currency_id) REFERENCES Currencies(currency_id)
+    )''')
+print("Table Payments created successfully")
+
 #Subscriptions
 
 dbase.execute(''' CREATE TABLE IF NOT EXISTS Subscriptions
@@ -100,10 +114,9 @@ dbase.execute(''' CREATE TABLE IF NOT EXISTS Subscriptions
         subscription_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         name VARCHAR(64),
         active BOOLEAN,
-        price_id INT NOT NULL,
-        FOREIGN KEY(price_id) REFERENCES Prices(price_id)
+        price INT NOT NULL
     )''')
-print("Table Invoices created successfully")
+print("Table Subscriptions created successfully")
 
 # Currencies
 
