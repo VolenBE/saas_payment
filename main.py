@@ -94,7 +94,7 @@ async def accepting_quote(payload: Request):
 @app.post("/convert_quote")
 async def convert_quote(payload: Request):
   values_dict = await payload.json()
-  # Open the DB
+  # Open the DB; 
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
