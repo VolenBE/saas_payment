@@ -82,24 +82,23 @@ def populate_companies():
         username = "".join(random_username())
         name =  "".join(get_company_names())
         create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
-
+populate_companies()
 def create_client(company_id, username, password, bankaccount, address):
     cursor.execute(''' 
         INSERT INTO Users(username,password,bankaccount,address)
         VALUES(?,?,?,?)''', (username, password, bankaccount, address))
     print("Customer account successfully created")
     client_id = int(cursor.lastrowid)
-    print(client_id)
     cursor.execute('''
         INSERT INTO Clients(client_id, company_id)
         VALUES(?,?)''', (client_id,company_id))
     print("Client id added to the Clients table")
 
 def populate_clients():
-    username = "".join(random_username())
     for i in range(1, 15):
+        username = "".join(random_username())
         create_client(select_random_companyid(), username, random_password(8), random_number(),random_address())
-
+populate_clients()
 def create_subscriptions(amount, currency, name):
     cursor.execute('SELECT rate FROM Currencies WHERE name=?', [currency])
     rate = float(cursor.fetchone()[0])
