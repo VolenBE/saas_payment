@@ -1,5 +1,6 @@
 import sqlite3
 import json
+import urllib.request
 from fastapi import FastAPI, Request
 import uvicorn
 
@@ -35,6 +36,18 @@ def checkCard(card_number):
         return True
     else:
         return False
+
+def get_rate(selected_currency):
+    url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
+    data = urllib.request.urlopen(url).read().decode()
+    
+    obj = json.loads(data)
+
+    for currency, rate in obj['conversion_rates'].items():
+        if currency == selected_currency:
+            selected_rate = rate
+            return rate
+print(get_rate("USD"))
 
 #il faut faire une requete api pour chaque élément, ajout d'un client, d'une subscription, ...
 #update les rates à chaque calcul

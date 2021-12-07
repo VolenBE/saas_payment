@@ -1,6 +1,4 @@
 import sqlite3
-import json
-import urllib.request
 import random
 
 dbase = sqlite3.connect('database.db', isolation_level=None)
@@ -120,7 +118,6 @@ def populate_subscriptions():
     for i in range(1, 15):
         create_subscriptions(random_price(), random_currency(), random_company_name())
         i+=1
-populate_subscriptions()
 def generate_quote_price():
     total_amount = 0
     currency = "EUR"
@@ -135,20 +132,11 @@ def generate_quote_price():
         INSERT INTO Prices(amount, currency,amount_euro)
         VALUES(?,?,?)''', (total_amount,currency,total_amount))
 
-def get_rates():
-    url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
-    data = urllib.request.urlopen(url).read().decode()
+#def update_rates():
+  #  url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
+   # data = urllib.request.urlopen(url).read().decode()
     
-    obj = json.loads(data)
+ #   obj = json.loads(data)
 
-    for currency, rate in obj['conversion_rates'].items():
-        cursor.execute('INSERT INTO Currencies(name,rate) VALUES(?,?)', (currency, rate))
-
-def update_rates():
-    url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
-    data = urllib.request.urlopen(url).read().decode()
-    
-    obj = json.loads(data)
-
-    for currency, rate in obj['conversion_rates'].items():
-        cursor.execute('UPDATE Currencies SET rate=? WHERE name=?', (rate, currency))
+#    for currency, rate in obj['conversion_rates'].items():
+#        cursor.execute('UPDATE Currencies SET rate=? WHERE name=?', (rate, currency))
