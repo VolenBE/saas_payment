@@ -154,8 +154,10 @@ async def convert_quote(payload: Request):
     WHERE quote_id={}
   '''.format(str(values_dict['quote_id'])))
 
-  id_client = check_query.fetchall()[0]
-  status = check_query.fetchall()[1]
+  fetch = check_query.fetchone()
+
+  id_client = fetch[0]
+  status = fetch[1]
 
   if id_client != values_dict['client_id'] or status != 1:
     return "Error"
@@ -163,8 +165,8 @@ async def convert_quote(payload: Request):
 
   cursor.execute('''
     INSERT INTO Invoices(pending, client_id, quote_id)
-    VALUES(?,?,?)
-  ''')
+    VALUES("{pending}","{client_id}","{quote_id}")
+  '''.format(pending=int(values_dict['pending']),client_id=int(values_dict['client_id']),quote_id=int(values_dict['quote_id'])))
   return True
 
 # API request : Check if there is a pending invoice
