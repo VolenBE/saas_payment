@@ -82,7 +82,7 @@ def populate_companies():
         username = "".join(random_username())
         name =  "".join(get_company_names())
         create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
-        
+
 def create_client(company_id, username, password, bankaccount, address):
     cursor.execute(''' 
         INSERT INTO Users(username,password,bankaccount,address)
@@ -124,8 +124,6 @@ def generate_quote_price():
     cursor.execute('SELECT name, price_id FROM Subscriptions ORDER BY RANDOM() LIMIT 3')
     random_sub1 = cursor.fetchall()
     for i in range(0,len(random_sub1)):
-        print(random_sub1[i][1])
-        print(i)
         cursor.execute('SELECT amount_euro FROM Prices WHERE price_id=?', [random_sub1[i][1]])
         total_amount = total_amount + float(cursor.fetchone()[0])
     cursor.execute('''

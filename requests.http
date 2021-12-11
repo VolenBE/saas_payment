@@ -30,7 +30,17 @@ Content-Type: application/json
     "company_id": 1,
     "client_id": 16,
     "quantity": 1,
-    "price_id": 15,
-    "subscriptions": "['Liberty Wealth Planner', 'Deuxieme', 'troisième']",
+    "subscriptions": "[1, 6, 8]",
     "accepted": 0
+}
+
+###
+POST http://127.0.0.1:8000/accepting_quote HTTP/1.1
+Content-Type: application/json
+
+{
+    "quote_id": 2,
+    "client_id": 16,
+    "accepted": 1
+
 }

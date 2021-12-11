@@ -94,11 +94,19 @@ async def quote_creation(payload: Request):
     # Open the DB
     dbase = sqlite3.connect('database.db', isolation_level=None)
     cursor = dbase.cursor()
+    total_price = 0
     
+    subscriptions_list = json.loads(values_dict['subscriptions'])
+    print(subscriptions_list)
+
+    for subscriptions in subscriptions_list:
+      cursor.execute('SELECT price FROM Subscriptions WHERE subscription_id=?', [subscriptions])
+      total_price += int(cursor.fetchone()[0])
+
     cursor.execute('''
-      INSERT INTO Quotes(company_id,client_id,quantity,price_id,subscriptions_list,accepted)
-      VALUES("{company_id}","{client_id}","{quantity}","{price_id}","{subscriptions}","{accepted}")
-    '''.format(company_id=int(values_dict['company_id']),client_id=int(values_dict['client_id']),quantity=int(values_dict['quantity']),price_id=int(values_dict['price_id']),subscriptions=str(values_dict["subscriptions"]),accepted=int(values_dict['accepted'])))
+      INSERT INTO Quotes(company_id,client_id,quantity,price_eur,subscriptions_list,accepted)
+      VALUES("{company_id}","{client_id}","{quantity}","{price}","{subscriptions}","{accepted}")
+    '''.format(company_id=int(values_dict['company_id']),client_id=int(values_dict['client_id']),quantity=int(values_dict['quantity']),price=int(total_price),subscriptions=str(values_dict["subscriptions"]),accepted=int(values_dict['accepted'])))
     return {"message": "Successfully created the quote !"}
 
 # API request : Quote acceptation from the client
@@ -116,10 +124,11 @@ async def accepting_quote(payload: Request):
     WHERE quote_id={}
   '''.format(str(values_dict['quote_id'])))
 
-  id_client = check_query.fetchall()[0]
-  status = check_query.fetchall()[1]
+  id_client = check_query.fetchone()[0]
 
-  if id_client != values_dict['client_id'] or status != 0:
+  print(id_client)
+
+  if id_client != values_dict['client_id']:
     return "Error"
 
   cursor.execute('''
