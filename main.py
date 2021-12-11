@@ -161,7 +161,6 @@ async def convert_quote(payload: Request):
 
   if id_client != values_dict['client_id'] or status != 1:
     return "Error"
-  
 
   cursor.execute('''
     INSERT INTO Invoices(pending, client_id, quote_id)
