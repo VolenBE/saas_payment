@@ -82,7 +82,7 @@ def populate_companies():
         username = "".join(random_username())
         name =  "".join(get_company_names())
         create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
-populate_companies()
+        
 def create_client(company_id, username, password, bankaccount, address):
     cursor.execute(''' 
         INSERT INTO Users(username,password,bankaccount,address)
@@ -98,25 +98,26 @@ def populate_clients():
     for i in range(1, 15):
         username = "".join(random_username())
         create_client(select_random_companyid(), username, random_password(8), random_number(),random_address())
-populate_clients()
-def create_subscriptions(amount, currency, name):
-    cursor.execute('SELECT rate FROM Currencies WHERE name=?', [currency])
-    rate = float(cursor.fetchone()[0])
-    print(rate)
-    amount_euro = amount / rate
-    print(amount_euro)
+
+def create_subscriptions(amount, name):
+    #cursor.execute('SELECT rate FROM Currencies WHERE name=?', [currency])
+    #rate = float(cursor.fetchone()[0])
+    #print(rate)
+    #amount_euro = amount / rate
+    #print(amount_euro)
+    #cursor.execute('''
+    #    INSERT INTO Prices(amount, currency,amount_euro)
+    #    VALUES(?,?,?)''', (amount,currency,amount_euro))
+    #new_price_id = int(cursor.lastrowid)
     cursor.execute('''
-        INSERT INTO Prices(amount, currency,amount_euro)
-        VALUES(?,?,?)''', (amount,currency,amount_euro))
-    new_price_id = int(cursor.lastrowid)
-    cursor.execute('''
-        INSERT INTO Subscriptions(name, active, price_id)
-        VALUES(?,?,?)''', (name, 0, new_price_id))
+        INSERT INTO Subscriptions(name, active, price)
+        VALUES(?,?,?)''', (name, 0, amount))
 
 def populate_subscriptions():
     for i in range(1, 15):
-        create_subscriptions(random_price(), random_currency(), random_company_name())
+        create_subscriptions(random_price(), random_company_name())
         i+=1
+populate_subscriptions()
 def generate_quote_price():
     total_amount = 0
     currency = "EUR"

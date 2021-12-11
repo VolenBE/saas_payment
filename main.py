@@ -47,7 +47,6 @@ def get_rate(selected_currency):
         if currency == selected_currency:
             selected_rate = rate
             return rate
-print(get_rate("USD"))
 
 #il faut faire une requete api pour chaque élément, ajout d'un client, d'une subscription, ...
 #update les rates à chaque calcul
@@ -57,8 +56,37 @@ print(get_rate("USD"))
 #faire en sorte que le statut de la invoice soit changé automatiquement le dernier jour du mois une fois
 #peut être stocker la dernier date de paiement genre if date = lastdayofthemonth && lastpaymentdate != lastdayofthemonth then:
 
+@app.post("/register_client")
+async def register_client(payload: Request):
+    values_dict = await payload.json()
+    # Open the DB
+    dbase = sqlite3.connect('database.db', isolation_level=None)
+    cursor = dbase.cursor()
 
-# First API request : Quote creation
+    cursor.execute(''' 
+      INSERT INTO Users(username,password,bankaccount,address)
+      VALUES("{username}","{password}","{bankaccount}","{address}")
+      '''.format(username=str(values_dict['username']), password=str(values_dict['password']), bankaccount=int(values_dict['bankaccount']), address=str(values_dict['address'])))
+    client_id = int(cursor.lastrowid)
+    cursor.execute('''
+      INSERT INTO Clients(client_id, company_id)
+      VALUES(?,?)''', (client_id,values_dict['company_id']))
+    return {"message": "Successfully registered the client!"}
+
+# API request: Subscription creation
+
+@app.post("/subscription_creation")
+async def subscription_creation(payload: Request):
+    values_dict = await payload.json()
+    # Open the DB
+    dbase = sqlite3.connect('database.db', isolation_level=None)
+    cursor = dbase.cursor()
+
+    cursor.execute('''
+        INSERT INTO Subscriptions(name, active, price)
+        VALUES("{name}","{active}","{price}")'''.format(name = str(values_dict['name']),active=int(values_dict['active']), price=int(values_dict['price'])))
+
+# API request : Quote creation
 
 @app.post("/quote_creation")
 async def quote_creation(payload: Request):
@@ -73,7 +101,7 @@ async def quote_creation(payload: Request):
     '''.format(company_id=int(values_dict['company_id']),client_id=int(values_dict['client_id']),quantity=int(values_dict['quantity']),price_id=int(values_dict['price_id']),subscriptions=str(values_dict["subscriptions"]),accepted=int(values_dict['accepted'])))
     return {"message": "Successfully created the quote !"}
 
-# Second API request : Quote acceptation from the client
+# API request : Quote acceptation from the client
 
 @app.post("/accepting_quote")
 async def accepting_quote(payload: Request):
@@ -102,7 +130,7 @@ async def accepting_quote(payload: Request):
     '''.format(accepted = int(values_dict['accepted']), quote_id = int(values_dict['quote_id']), client_id = int(values_dict['client_id'])))
   return {"message": "Successfully accepted the quote !"}
 
-# Third API request : Quote convertion from the Company
+# API request : Quote convertion from the Company
 
 @app.post("/convert_quote")
 async def convert_quote(payload: Request):
@@ -130,21 +158,21 @@ async def convert_quote(payload: Request):
   ''')
   return True
 
-# Fourth API request : Check if there is a pending invoice
+# API request : Check if there is a pending invoice
 
 @app.get("/invoice")
 async def invoice():
   # We will put here the code to execute
   return True
 
-# Fifth API request : Pay invoice using credit card number
+# API request : Pay invoice using credit card number
 
 @app.post("/pay_invoice")
 async def pay_invoice():
   # We will put here the code to execute
   return True
 
-# Sixth API request : Company retrieve their stats
+# API request : Company retrieve their stats
 
 @app.get("/retrieve_stats")
 async def retrieve_stats():

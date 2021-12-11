@@ -1,3 +1,28 @@
+
+POST http://127.0.0.1:8000/register_client HTTP/1.1
+Content-Type: application/json
+
+{
+    "company_id": 1,
+    "username": "jean",
+    "password": "jean2130",
+    "bankaccount": 1031891,
+    "address": "12 boulevard de l'église Charleroi"
+}
+
+###
+
+POST http://127.0.0.1:8000/subscription_creation HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Spotify",
+    "active": 0,
+    "price": 12
+}
+
+###
+
 POST http://127.0.0.1:8000/quote_creation HTTP/1.1
 Content-Type: application/json
 
