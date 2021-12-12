@@ -15,28 +15,31 @@ def root():
 # Functions
 
 def checkCard(card_number):
-     # we initialize the variable we will use during the iteration
-    digits_sum = 0 
-
-    #we use enumerate to get the count of the current iteration and the value of the item at the current iteration. Reversed is used to reverse the card_number since we are supposed to start from the end
-    for i, digit in enumerate(reversed(card_number)): 
-        #we make sure digit is an int 
-        j = int(digit)  
-        # we use the modulus operator to see if the number is dividable by 2
-        if i % 2 == 0: 
-            # if so we add it to the sum
-            digits_sum += j 
-        elif j >= 5: 
-            # for the last numbers we multiply them by 2 and we subtract 9
-            digits_sum += j * 2 - 9
-        else: 
-            # for the rest we just multiply them by 2
-            digits_sum += j * 2
+  # we initialize the variable we will use during the iteration
+  digits_sum = 0 
+  card_number = [int(x) for x in str(card_number)]
+  print(card_number)
+  #we use enumerate to get the count of the current iteration and the value of the item at the current iteration. Reversed is used to reverse the card_number since we are supposed to start from the end
+  for i, digit in enumerate(reversed(card_number)): 
+      print(i, digit)
+      #we make sure digit is an int 
+      j = int(digit)  
+      # we use the modulus operator to see if the number is dividable by 2
+      if i % 2 == 0: 
+        # if so we add it to the sum
+        digits_sum += j 
+      elif j >= 5: 
+        # for the last numbers we multiply them by 2 and we subtract 9
+        digits_sum += j * 2 - 9
+      else: 
+        # for the rest we just multiply them by 2
+        digits_sum += j * 2
     # if the final sum is dividable by 10 we return true because the card number is valid 
-    if  digits_sum % 10 == 0: 
-        return True
-    else:
-        return False
+  print(digits_sum)
+  if  digits_sum % 10 == 0: 
+    return True
+  else:
+    return False
 
 def get_rate(selected_currency):
     url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
@@ -226,8 +229,8 @@ async def pay_invoice(payload: Request):
   cursor = dbase.cursor()
   card_number = values_dict['cardnumber']
 
-  if checkCard(card_number):
-    cursor.execute()
+  if checkCard(card_number) == True:
+    return {"message": "valid credit card number"}
   else:
     return {"message": "Invalid credit card number"}
   
