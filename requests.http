@@ -55,3 +55,12 @@ Content-Type: application/json
     "client_id": 16,
     "pending": 1
 }
+
+###
+
+POST http://127.0.0.1:8000/invoice HTTP/1.1
+Content-Type: application/json
+
+{
+    "client_id": 16
+}

@@ -170,7 +170,7 @@ async def convert_quote(payload: Request):
 
 # API request : Check if there is a pending invoice
 
-@app.get("/invoice")
+@app.post("/invoice")
 async def invoice(payload: Request):
   values_dict = await payload.json()
   # Open the DB; 
@@ -187,7 +187,7 @@ async def invoice(payload: Request):
 
   fetch = pending_query.fetchone()
 
-  if fetch != None and fetch[1] == 1:
+  if fetch != None and fetch[0] == 1:
     quote_id = fetch[1]
     quote_query = cursor.execute('''
       SELECT subscriptions_list, price_eur
@@ -196,12 +196,24 @@ async def invoice(payload: Request):
     ''', [quote_id])
     fetch_quote = quote_query.fetchone()
 
-    subscriptions_list = fetch_quote[0]
-    sub_list = [str(element) for element in subscriptions_list]
-    sub_conv = ", ".join(sub_list)
+    subscriptions_list = json.loads(fetch_quote[0])
+    name_list = []
+
+    for elements in subscriptions_list:
+      cursor.execute('''
+        SELECT name
+        FROM Subscriptions
+        WHERE subscription_id=?
+      ''', [elements])
+      name = cursor.fetchone()[0]
+      name_list.append(name)
+      print(json.dumps(name_list))
+
     price = fetch_quote[1]
 
-    return {"message": "You have a pending invoice concerning the following subscriptions {subs} for a total price of {pricet}".format(subs=sub_conv,pricet=int(price))}
+    name_list = ', '.join(name_list)
+
+    return {"message": "You have a pending invoice concerning the following subscriptions: {subs} for a total price of: {pricet} euros".format(subs=name_list,pricet=int(price))}
   else:
     return {"message": "error"}
 # API request : Pay invoice using credit card number
