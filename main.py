@@ -17,11 +17,9 @@ def root():
 def checkCard(card_number):
   # we initialize the variable we will use during the iteration
   digits_sum = 0 
-  card_number = [int(x) for x in str(card_number)]
-  print(card_number)
+  card_number = [int(x) for x in str(card_number)] #we turn the int into an array to be able to use reversed()
   #we use enumerate to get the count of the current iteration and the value of the item at the current iteration. Reversed is used to reverse the card_number since we are supposed to start from the end
   for i, digit in enumerate(reversed(card_number)): 
-      print(i, digit)
       #we make sure digit is an int 
       j = int(digit)  
       # we use the modulus operator to see if the number is dividable by 2
@@ -35,7 +33,6 @@ def checkCard(card_number):
         # for the rest we just multiply them by 2
         digits_sum += j * 2
     # if the final sum is dividable by 10 we return true because the card number is valid 
-  print(digits_sum)
   if  digits_sum % 10 == 0: 
     return True
   else:
@@ -227,12 +224,37 @@ async def pay_invoice(payload: Request):
   # Open the DB; 
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
-  card_number = values_dict['cardnumber']
 
-  if checkCard(card_number) == True:
-    return {"message": "valid credit card number"}
+  card_number = int(values_dict['cardnumber'])
+  invoice = int(values_dict['invoice_id'])
+  currency = str(values_dict['currency'])
+
+  first_query = cursor.execute('SELECT pending, quote_id FROM Invoices WHERE invoice_id=?', [invoice])
+  fetch_first = first_query.fetchone()
+  pending = fetch_first[0]
+  quote_id = fetch_first[1]
+
+  if pending == 1:
+    second_query = cursor.execute('SELECT price_eur FROM Quotes WHERE quote_id=?', [quote_id])
+    price_eur = second_query.fetchone()[0]
+    rate = get_rate(currency)
+    price = price_eur * rate
+
+    if checkCard(card_number):
+      cursor.execute('''
+        INSERT INTO Payments(invoice_id, amount_eur, currency_name, amount_currency, success, LastPaymentDate)
+        VALUES(?,?,?,?,?,?)
+      ''', (invoice,price_eur,currency,price, 1, datetime.datetime.now()))
+      cursor.execute('UPDATE Invoices SET pending = 0 WHERE invoice_id=?', [invoice])
+      return {"message": "Payment successful"}
+    else:
+      cursor.execute('''
+        INSERT INTO Payments(invoice_id, amount_eur, currency_name, amount_currency, success, LastPaymentDate)
+        VALUES(?,?,?,?,?,?)
+      ''', (invoice,price_eur,currency,price, 0, datetime.datetime.now()))
+      return {"message": "Payment unsuccessful"}
   else:
-    return {"message": "Invalid credit card number"}
+    return {"message": "Invoice already paid"}
   
 
   return True

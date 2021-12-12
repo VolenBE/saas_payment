@@ -99,12 +99,11 @@ dbase.execute(''' CREATE TABLE IF NOT EXISTS Payments
         payment_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         invoice_id INT NOT NULL,
         amount_eur INT NOT NULL,
-        currency_id char(3) NOT NULL,
+        currency_name char(3) NOT NULL,
         amount_currency INT NOT NULL,
         success BOOLEAN NOT NULL,
         LastPaymentDate TIMESTAMP,
-        FOREIGN KEY (invoice_id) REFERENCES Invoices(invoice_id),
-        FOREIGN KEY (currency_id) REFERENCES Currencies(currency_id)
+        FOREIGN KEY (invoice_id) REFERENCES Invoices(invoice_id)
     )''')
 print("Table Payments created successfully")
 

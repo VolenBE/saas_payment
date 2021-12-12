@@ -71,5 +71,7 @@ POST http://127.0.0.1:8000/pay_invoice HTTP/1.1
 Content-Type: application/json
 
 {
-    "cardnumber": 79927398712
+    "cardnumber": 79927398713,
+    "currency": "USD",
+    "invoice_id": 1
 }
