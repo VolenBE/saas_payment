@@ -1,5 +1,6 @@
 import sqlite3
 import json
+import datetime
 import urllib.request
 from fastapi import FastAPI, Request
 import uvicorn
@@ -51,7 +52,6 @@ def get_rate(selected_currency):
 #il faut faire une requete api pour chaque élément, ajout d'un client, d'une subscription, ...
 #update les rates à chaque calcul
 #AMR = argent reçu par mois par customers
-#changer le système, stocker le prix de chaque subscriptions en euros dans la bdd, lorsque l'on crée la quote on stocke le prix total
 #lorsque le customer paye l'invoice on stocke à ce moment là la currency utilisée et on convertit le prix en euro dans la monnaie choisie
 #faire en sorte que le statut de la invoice soit changé automatiquement le dernier jour du mois une fois
 #peut être stocker la dernier date de paiement genre if date = lastdayofthemonth && lastpaymentdate != lastdayofthemonth then:
@@ -166,20 +166,60 @@ async def convert_quote(payload: Request):
     INSERT INTO Invoices(pending, client_id, quote_id)
     VALUES("{pending}","{client_id}","{quote_id}")
   '''.format(pending=int(values_dict['pending']),client_id=int(values_dict['client_id']),quote_id=int(values_dict['quote_id'])))
-  return True
+  return {"message": "Successfully converted the quote !"}
 
 # API request : Check if there is a pending invoice
 
 @app.get("/invoice")
-async def invoice():
-  # We will put here the code to execute
-  return True
+async def invoice(payload: Request):
+  values_dict = await payload.json()
+  # Open the DB; 
+  dbase = sqlite3.connect('database.db', isolation_level=None)
+  cursor = dbase.cursor()
 
+  client_id = values_dict['client_id']
+
+  pending_query = cursor.execute('''
+    SELECT pending, quote_id
+    FROM Invoices
+    WHERE client_id=?
+  ''', [client_id])
+
+  fetch = pending_query.fetchone()
+
+  if fetch != None and fetch[1] == 1:
+    quote_id = fetch[1]
+    quote_query = cursor.execute('''
+      SELECT subscriptions_list, price_eur
+      FROM Quotes
+      WHERE quote_id=?
+    ''', [quote_id])
+    fetch_quote = quote_query.fetchone()
+
+    subscriptions_list = fetch_quote[0]
+    sub_list = [str(element) for element in subscriptions_list]
+    sub_conv = ", ".join(sub_list)
+    price = fetch_quote[1]
+
+    return {"message": "You have a pending invoice concerning the following subscriptions {subs} for a total price of {pricet}".format(subs=sub_conv,pricet=int(price))}
+  else:
+    return {"message": "error"}
 # API request : Pay invoice using credit card number
 
 @app.post("/pay_invoice")
-async def pay_invoice():
-  # We will put here the code to execute
+async def pay_invoice(payload: Request):
+  values_dict = await payload.json()
+  # Open the DB; 
+  dbase = sqlite3.connect('database.db', isolation_level=None)
+  cursor = dbase.cursor()
+  card_number = values_dict['cardnumber']
+
+  if checkCard(card_number):
+    cursor.execute()
+  else:
+    return {"message": "Invalid credit card number"}
+  
+
   return True
 
 # API request : Company retrieve their stats
