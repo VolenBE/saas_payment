@@ -1,6 +1,7 @@
 import sqlite3
 import json
 import datetime
+from datetime import date
 import urllib.request
 from fastapi import FastAPI, Request
 import uvicorn
@@ -12,7 +13,20 @@ def root():
   return {"message": "It works !"}
 
 
-# Functions
+# Useful Functions
+
+
+def last_day_of_month(any_day):
+    # this will never fail
+    # get close to the end of the month for any day, and add 4 days 'over'
+    next_month = any_day.replace(day=28) + datetime.timedelta(days=4)
+    # subtract the number of remaining 'overage' days to get last day of current month, or said programattically said, the previous day of the first of next month
+    lastday = next_month - datetime.timedelta(days=next_month.day)
+    return lastday
+
+
+
+  # source: https://stackoverflow.com/a/13565185/13466313
 
 def checkCard(card_number):
   # we initialize the variable we will use during the iteration
@@ -244,20 +258,18 @@ async def pay_invoice(payload: Request):
       cursor.execute('''
         INSERT INTO Payments(invoice_id, amount_eur, currency_name, amount_currency, success, LastPaymentDate)
         VALUES(?,?,?,?,?,?)
-      ''', (invoice,price_eur,currency,price, 1, datetime.datetime.now()))
+      ''', (invoice,price_eur,currency,price, 1, date.isoformat(datetime.datetime.now())))
       cursor.execute('UPDATE Invoices SET pending = 0 WHERE invoice_id=?', [invoice])
       return {"message": "Payment successful"}
     else:
       cursor.execute('''
         INSERT INTO Payments(invoice_id, amount_eur, currency_name, amount_currency, success, LastPaymentDate)
         VALUES(?,?,?,?,?,?)
-      ''', (invoice,price_eur,currency,price, 0, datetime.datetime.now()))
+      ''', (invoice,price_eur,currency,price, 0, date.isoformat(datetime.datetime.now())))
       return {"message": "Payment unsuccessful"}
   else:
     return {"message": "Invoice already paid"}
   
-
-  return True
 
 # API request : Company retrieve their stats
 
@@ -268,17 +280,53 @@ async def pay_invoice(payload: Request):
 #business's term subscriptions normalized for a single calendar year. It is a
 #subscription economy metric that shows the money that comes in every year for the
 #life of a subscription (or contract).
+
+
+
 #3. Number of customers
+
+@app.get("/number_customers")
+async def number_customers(payload: Request):
+  values_dict = await payload.json()
+  # Open the DB; 
+  dbase = sqlite3.connect('database.db', isolation_level=None)
+  cursor = dbase.cursor()
+
+  company_id = values_dict['company_id']
+
+  # Number of customers
+  cursor.execute('''
+    SELECT COUNT()
+    FROM Clients
+    WHERE company_id=?  
+  ''', [company_id])
+
+  number_clients = cursor.fetchone()[0]
+
+  return {"message": "You have a total of: {number_clients} customers".format(number_clients=number_clients)}
+
+
 #4. Average revenues per customers
 #5. A table of all customers with their current subscriptions
 
-@app.get("/retrieve_stats")
-async def retrieve_stats():
-  # We will put here the code to execute
-  return True
-
 
 if __name__ == '__main__':
+  dbase = sqlite3.connect('database.db', isolation_level=None)
+  cursor = dbase.cursor()
+  lastday = last_day_of_month(datetime.datetime.now())
+
+  result = lastday.day - datetime.datetime.now().day
+  cursor.execute('SELECT LastReset FROM Tech')
+  last_reset = datetime.datetime.strptime(cursor.fetchone()[0], '%Y-%m-%d %H:%M:%S.%f')
+  diff_reset = last_reset.day - last_day_of_month(datetime.datetime.now()).day 
+
+  if result == 0 and (diff_reset < 0 or diff_reset > 0):
+    cursor.execute('SELECT COUNT() FROM Invoices')
+    fetch = 1 + cursor.fetchone()[0]
+    for i in range(1, fetch):
+      cursor.execute('UPDATE Invoices SET pending = 1 WHERE invoice_id = ?', [i])
+    cursor.execute('UPDATE Tech SET LastReset=?', [datetime.datetime.now()])
+    
   uvicorn.run(app, host='127.0.0.1', port=8000)
 
 

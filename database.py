@@ -129,6 +129,15 @@ dbase.execute('''CREATE TABLE IF NOT EXISTS Currencies
 ''')
 print("Table Currencies created successfully")
 
+# Technical
+
+dbase.execute('''CREATE TABLE IF NOT EXISTS Tech
+    (
+        LastReset TIMESTAMP
+    )
+''')
+print("Table Tech created successfully")
+
 
 #dbase.execute(''' 
 #                INSERT INTO Users(username,password,bankaccount,address)

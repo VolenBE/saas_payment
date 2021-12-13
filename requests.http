@@ -73,5 +73,15 @@ Content-Type: application/json
 {
     "cardnumber": 79927398713,
     "currency": "USD",
-    "invoice_id": 1
+    "invoice_id": 2
 }
+
+###
+
+GET http://127.0.0.1:8000/number_customers HTTP/1.1
+Content-Type: application/json
+
+{
+    "company_id": 1
+}
+
