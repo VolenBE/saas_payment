@@ -261,6 +261,17 @@ async def pay_invoice(payload: Request):
 
 # API request : Company retrieve their stats
 
+
+#1.Monthly Recurring Revenue (MRR) which is the predictable total revenue generated
+#by a company from all the active subscriptions in a particular month.
+#2. Annual Recurring Revenue (ARR), which is the value of the recurring revenue of a
+#business's term subscriptions normalized for a single calendar year. It is a
+#subscription economy metric that shows the money that comes in every year for the
+#life of a subscription (or contract).
+#3. Number of customers
+#4. Average revenues per customers
+#5. A table of all customers with their current subscriptions
+
 @app.get("/retrieve_stats")
 async def retrieve_stats():
   # We will put here the code to execute
