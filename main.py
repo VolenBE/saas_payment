@@ -24,8 +24,6 @@ def last_day_of_month(any_day):
     lastday = next_month - datetime.timedelta(days=next_month.day)
     return lastday
 
-
-
   # source: https://stackoverflow.com/a/13565185/13466313
 
 def checkCard(card_number):
@@ -276,11 +274,28 @@ async def pay_invoice(payload: Request):
 
 #1.Monthly Recurring Revenue (MRR) which is the predictable total revenue generated
 #by a company from all the active subscriptions in a particular month.
+
+
+@app.get("/mmr")
+async def mmr(payload: Request):
+  values_dict = await payload.json()
+  # Open the DB; 
+  dbase = sqlite3.connect('database.db', isolation_level=None)
+  cursor = dbase.cursor()
+
+
 #2. Annual Recurring Revenue (ARR), which is the value of the recurring revenue of a
 #business's term subscriptions normalized for a single calendar year. It is a
 #subscription economy metric that shows the money that comes in every year for the
 #life of a subscription (or contract).
 
+
+@app.get("/arr")
+async def arr(payload: Request):
+  values_dict = await payload.json()
+  # Open the DB; 
+  dbase = sqlite3.connect('database.db', isolation_level=None)
+  cursor = dbase.cursor()
 
 
 #3. Number of customers
@@ -307,20 +322,36 @@ async def number_customers(payload: Request):
 
 
 #4. Average revenues per customers
+
+
+@app.get("/average_revenue")
+async def average_revenue(payload: Request):
+  values_dict = await payload.json()
+  # Open the DB; 
+  dbase = sqlite3.connect('database.db', isolation_level=None)
+  cursor = dbase.cursor()
+
+
 #5. A table of all customers with their current subscriptions
 
+@app.get("/customer_subs")
+async def customer_subs(payload: Request):
+  values_dict = await payload.json()
+  # Open the DB; 
+  dbase = sqlite3.connect('database.db', isolation_level=None)
+  cursor = dbase.cursor()
 
 if __name__ == '__main__':
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
-  lastday = last_day_of_month(datetime.datetime.now())
+  lastday = last_day_of_month(datetime.datetime.now()) #we get the last day of this month
 
-  result = lastday.day - datetime.datetime.now().day
+  result = lastday.day - datetime.datetime.now().day #we substract last day of the month with the actual one
   cursor.execute('SELECT LastReset FROM Tech')
-  last_reset = datetime.datetime.strptime(cursor.fetchone()[0], '%Y-%m-%d %H:%M:%S.%f')
-  diff_reset = last_reset.day - last_day_of_month(datetime.datetime.now()).day 
+  last_reset = datetime.datetime.strptime(cursor.fetchone()[0], '%Y-%m-%d %H:%M:%S.%f') #we need to convert back the str stored in the database to a timestamp
+  diff_reset = last_day_of_month(datetime.datetime.now()).day - last_reset.day #we check that last reset wasn't today
 
-  if result == 0 and (diff_reset < 0 or diff_reset > 0):
+  if result == 0 and diff_reset != 0:
     cursor.execute('SELECT COUNT() FROM Invoices')
     fetch = 1 + cursor.fetchone()[0]
     for i in range(1, fetch):
