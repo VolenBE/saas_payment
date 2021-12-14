@@ -32,8 +32,8 @@ def random_password(longueur):
     letters = ['A','B','D','e','F','z','m','i']
     numbers = ['1','2','3','4','5','6','7','8','9']
     all = letters + numbers
-    temp = random.sample(all,longueur)
-    password = "".join(temp)
+    temp = random.sample(all,longueur) #take random elements from letters and numbers for a total set length
+    password = "".join(temp) #put the sample that we get in a string
     return password
 
 def random_number():
@@ -43,16 +43,16 @@ def random_number():
     return bankaccount
 
 def random_price():
-    random_price = random.randint(5,100)
+    random_price = random.randint(5,100) #random number between 6 and 99
     return random_price
 
-def random_currency():
-    cursor.execute('SELECT name FROM Currencies ORDER BY RANDOM() LIMIT 1')
-    random_currency = cursor.fetchone()[0]
-    return random_currency
+#def random_currency():
+ #   cursor.execute('SELECT name FROM Currencies ORDER BY RANDOM() LIMIT 1') 
+ #   random_currency = cursor.fetchone()[0]
+ #   return random_currency
 
 def random_company_name():
-    cursor.execute('SELECT company_name FROM Companies ORDER BY RANDOM() LIMIT 1')
+    cursor.execute('SELECT company_name FROM Companies ORDER BY RANDOM() LIMIT 1') #we pick a random company from the db
     random_company_name = cursor.fetchone()[0]
     return random_company_name
 
