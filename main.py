@@ -353,7 +353,7 @@ if __name__ == '__main__':
 
   if result == 0 and diff_reset != 0:
     cursor.execute('SELECT COUNT() FROM Invoices')
-    fetch = 1 + cursor.fetchone()[0]
+    fetch = 1 + cursor.fetchone()[0] # +1 to counter python stopping before reaching the end of the range
     for i in range(1, fetch):
       cursor.execute('UPDATE Invoices SET pending = 1 WHERE invoice_id = ?', [i])
     cursor.execute('UPDATE Tech SET LastReset=?', [datetime.datetime.now()])
