@@ -219,7 +219,7 @@ async def invoice(payload: Request):
       ''', [elements])
       name = cursor.fetchone()[0]
       name_list.append(name)
-      print(json.dumps(name_list))
+      #print(json.dumps(name_list))
 
     price = fetch_quote[1]
 
