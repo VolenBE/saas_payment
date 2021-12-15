@@ -365,6 +365,8 @@ async def customer_subs(payload: Request):
   # Open the DB; 
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
+
+  company_id = values_dict['company_id']
   
   cursor.execute('SELECT client_id FROM Clients WHERE company_id=?', [company_id])
   main_df = pd.DataFrame(cursor.fetchall(), columns=['ids'])
