@@ -43,7 +43,7 @@ def random_number():
     return bankaccount
 
 def random_price():
-    random_price = random.randint(5,100) #random number between 6 and 99
+    random_price = random.randint(5,100) 
     return random_price
 
 #def random_currency():
@@ -82,7 +82,7 @@ def populate_companies():
         username = "".join(random_username())
         name =  "".join(get_company_names())
         create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
-
+populate_companies()
 def create_client(company_id, username, password, bankaccount, address):
     cursor.execute(''' 
         INSERT INTO Users(username,password,bankaccount,address)
@@ -98,7 +98,7 @@ def populate_clients():
     for i in range(1, 15):
         username = "".join(random_username())
         create_client(select_random_companyid(), username, random_password(8), random_number(),random_address())
-
+populate_clients()
 def create_subscriptions(amount, name):
     #cursor.execute('SELECT rate FROM Currencies WHERE name=?', [currency])
     #rate = float(cursor.fetchone()[0])

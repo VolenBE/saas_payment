@@ -87,6 +87,7 @@ dbase.execute(''' CREATE TABLE IF NOT EXISTS Invoices
         pending BOOLEAN,
         client_id INT NOT NULL,
         quote_id INT NOT NULL,
+        amount INT NOT NULL,
         FOREIGN KEY (client_id) REFERENCES clients(client_id),
         FOREIGN KEY (quote_id) REFERENCES Quotes(quote_id)
     )''')

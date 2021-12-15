@@ -5,6 +5,7 @@ from datetime import date
 import urllib.request
 from fastapi import FastAPI, Request
 import uvicorn
+import pandas as pd
 
 app = FastAPI()
 
@@ -107,6 +108,14 @@ async def quote_creation(payload: Request):
     dbase = sqlite3.connect('database.db', isolation_level=None)
     cursor = dbase.cursor()
     total_price = 0
+
+    client_id = values_dict['client_id']
+    company_id = values_dict['company_id']
+
+    cursor.execute('SELECT client_id FROM Clients WHERE company_id=? AND client_id=?', [company_id, client_id])
+
+    if cursor.fetchone() == None:
+      return {"message": "The customer is not a client from the company"}
     
     subscriptions_list = json.loads(values_dict['subscriptions'])
     print(subscriptions_list)
@@ -161,7 +170,7 @@ async def convert_quote(payload: Request):
   cursor = dbase.cursor()
 
   check_query = cursor.execute('''
-    SELECT client_id, accepted
+    SELECT client_id, accepted, price_eur
     FROM Quotes
     WHERE quote_id={}
   '''.format(str(values_dict['quote_id'])))
@@ -170,14 +179,15 @@ async def convert_quote(payload: Request):
 
   id_client = fetch[0]
   status = fetch[1]
+  amount = fetch[2]
 
   if id_client != values_dict['client_id'] or status != 1:
     return "Error"
 
   cursor.execute('''
-    INSERT INTO Invoices(pending, client_id, quote_id)
-    VALUES("{pending}","{client_id}","{quote_id}")
-  '''.format(pending=int(values_dict['pending']),client_id=int(values_dict['client_id']),quote_id=int(values_dict['quote_id'])))
+    INSERT INTO Invoices(pending, client_id, quote_id, amount)
+    VALUES("{pending}","{client_id}","{quote_id}", "{amount}")
+  '''.format(pending=int(values_dict['pending']),client_id=int(values_dict['client_id']),quote_id=int(values_dict['quote_id']),amount=int(amount)))
   return {"message": "Successfully converted the quote !"}
 
 # API request : Check if there is a pending invoice
@@ -331,7 +341,22 @@ async def average_revenue(payload: Request):
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
+  company_id = 5
 
+  cursor.execute('SELECT client_id FROM Clients WHERE company_id=?', [company_id])
+  df = pd.DataFrame(cursor.fetchall(), columns=['ids'])
+  client_ids = df['ids'].to_list()
+  rev_customers = []
+
+  for ids in client_ids:
+    cursor.execute('SELECT invoice_id, amount FROM Invoices WHERE client_id=?', [ids])
+    fetch = cursor.fetchone()
+    if fetch != None:
+        invoice_id = fetch[0]
+        amount = fetch[1]
+        rev_customers.append(amount)
+  mean = sum(rev_customers) / len(rev_customers)
+  return {"message": "The average revenue per customer is: {average_revenue}".format(average_revenue = mean)}
 #5. A table of all customers with their current subscriptions
 
 @app.get("/customer_subs")
@@ -340,6 +365,9 @@ async def customer_subs(payload: Request):
   # Open the DB; 
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
+  
+
+# Server launch and reset invoices if last day of the month 
 
 if __name__ == '__main__':
   dbase = sqlite3.connect('database.db', isolation_level=None)
@@ -347,6 +375,9 @@ if __name__ == '__main__':
   lastday = last_day_of_month(datetime.datetime.now()) #we get the last day of this month
 
   result = lastday.day - datetime.datetime.now().day #we substract last day of the month with the actual one
+  cursor.execute('SELECT LastReset FROM Tech')
+  if cursor.fetchone() == None:
+      cursor.execute('INSERT INTO Tech(LastReset) VALUES(?)', [datetime.datetime.now()])
   cursor.execute('SELECT LastReset FROM Tech')
   last_reset = datetime.datetime.strptime(cursor.fetchone()[0], '%Y-%m-%d %H:%M:%S.%f') #we need to convert back the str stored in the database to a timestamp
   diff_reset = last_day_of_month(datetime.datetime.now()).day - last_reset.day #we check that last reset wasn't today

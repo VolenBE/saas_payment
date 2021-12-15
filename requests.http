@@ -27,7 +27,7 @@ POST http://127.0.0.1:8000/quote_creation HTTP/1.1
 Content-Type: application/json
 
 {
-    "company_id": 1,
+    "company_id": 10,
     "client_id": 16,
     "quantity": 1,
     "subscriptions": "[1, 6, 8]",
@@ -39,7 +39,7 @@ POST http://127.0.0.1:8000/accepting_quote HTTP/1.1
 Content-Type: application/json
 
 {
-    "quote_id": 2,
+    "quote_id": 1,
     "client_id": 16,
     "accepted": 1
 
@@ -51,7 +51,7 @@ POST http://127.0.0.1:8000/convert_quote HTTP/1.1
 Content-Type: application/json
 
 {
-    "quote_id": 2,
+    "quote_id": 1,
     "client_id": 16,
     "pending": 1
 }
@@ -73,7 +73,7 @@ Content-Type: application/json
 {
     "cardnumber": 79927398713,
     "currency": "USD",
-    "invoice_id": 2
+    "invoice_id": 1
 }
 
 ###
