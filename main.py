@@ -376,10 +376,10 @@ if __name__ == '__main__':
 
   result = lastday.day - datetime.datetime.now().day #we substract last day of the month with the actual one
   cursor.execute('SELECT LastReset FROM Tech')
-  if cursor.fetchone() == None:
+  fetch = cursor.fetchone()
+  if fetch == None:
       cursor.execute('INSERT INTO Tech(LastReset) VALUES(?)', [datetime.datetime.now()])
-  cursor.execute('SELECT LastReset FROM Tech')
-  last_reset = datetime.datetime.strptime(cursor.fetchone()[0], '%Y-%m-%d %H:%M:%S.%f') #we need to convert back the str stored in the database to a timestamp
+  last_reset = datetime.datetime.strptime(fetch[0], '%Y-%m-%d %H:%M:%S.%f') #we need to convert back the str stored in the database to a timestamp
   diff_reset = last_day_of_month(datetime.datetime.now()).day - last_reset.day #we check that last reset wasn't today
 
   if result == 0 and diff_reset != 0:
