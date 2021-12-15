@@ -357,6 +357,7 @@ async def average_revenue(payload: Request):
         rev_customers.append(amount)
   mean = sum(rev_customers) / len(rev_customers)
   return {"message": "The average revenue per customer is: {average_revenue}".format(average_revenue = mean)}
+  
 #5. A table of all customers with their current subscriptions
 
 @app.get("/customer_subs")
@@ -382,8 +383,8 @@ async def customer_subs(payload: Request):
       second_df = pd.DataFrame(cursor.fetchall(), columns=['Quotes ids'])
       quote_ids = second_df['Quotes ids'].to_list()
       print(quote_ids)
-      if quote_ids:
-          for qids in quote_ids:
+      if quote_ids: #si l'array n'est pas vide
+          for qids in quote_ids: # on réalise une itteration sur les différents quote id
               cursor.execute('SELECT subscriptions_list FROM Quotes WHERE quote_id=?', [qids])
               fetch_subs = json.loads(cursor.fetchone()[0])
               for elements in fetch_subs:
@@ -395,7 +396,7 @@ async def customer_subs(payload: Request):
                   name = cursor.fetchone()[0]
                   el_list.append(name)
           name_list.append(el_list)
-      else:
+      else: #si l'array est vide
           name_list.append("No subscription")
 
   print(name_list)
