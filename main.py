@@ -341,7 +341,7 @@ async def average_revenue(payload: Request):
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
-  company_id = 5
+  company_id = values_dict['company_id']
 
   cursor.execute('SELECT client_id FROM Clients WHERE company_id=?', [company_id])
   df = pd.DataFrame(cursor.fetchall(), columns=['ids'])
