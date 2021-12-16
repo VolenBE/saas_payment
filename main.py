@@ -117,6 +117,8 @@ async def quote_creation(payload: Request):
     if cursor.fetchone() == None:
       return {"message": "The customer is not a client from the company"}
     
+    # with more time would have added a check to make sure subscription is linked to the client before converting to quote
+
     subscriptions_list = json.loads(values_dict['subscriptions'])
     print(subscriptions_list)
 
@@ -250,6 +252,7 @@ async def pay_invoice(payload: Request):
   card_number = int(values_dict['cardnumber'])
   invoice = int(values_dict['invoice_id'])
   currency = str(values_dict['currency'])
+  client_id = int(values_dict['client_id'])
 
   first_query = cursor.execute('SELECT pending, quote_id FROM Invoices WHERE invoice_id=?', [invoice])
   fetch_first = first_query.fetchone()
@@ -268,12 +271,64 @@ async def pay_invoice(payload: Request):
         VALUES(?,?,?,?,?,?)
       ''', (invoice,price_eur,currency,price, 1, date.isoformat(datetime.datetime.now())))
       cursor.execute('UPDATE Invoices SET pending = 0 WHERE invoice_id=?', [invoice])
+
+      pending_query = cursor.execute('''
+        SELECT pending, quote_id
+        FROM Invoices
+        WHERE client_id=?
+        ''', [client_id])
+
+      fetch = pending_query.fetchone()
+
+      if fetch != None and fetch[0] == 1:
+        quote_id = fetch[1]
+        quote_query = cursor.execute('''
+          SELECT subscriptions_list, price_eur
+          FROM Quotes
+          WHERE quote_id=?
+        ''', [quote_id])
+        fetch_quote = quote_query.fetchone()
+
+        subscriptions_list = json.loads(fetch_quote[0])
+
+        for elements in subscriptions_list:
+          cursor.execute('''
+          UPDATE Subscriptions
+          SET status=1
+          WHERE subscription_id=?
+          ''', [elements])
       return {"message": "Payment successful"}
     else:
       cursor.execute('''
         INSERT INTO Payments(invoice_id, amount_eur, currency_name, amount_currency, success, LastPaymentDate)
         VALUES(?,?,?,?,?,?)
       ''', (invoice,price_eur,currency,price, 0, date.isoformat(datetime.datetime.now())))
+
+      pending_query = cursor.execute('''
+        SELECT pending, quote_id
+        FROM Invoices
+        WHERE client_id=?
+        ''', [client_id])
+
+      fetch = pending_query.fetchone()
+
+      if fetch != None and fetch[0] == 1:
+        quote_id = fetch[1]
+        quote_query = cursor.execute('''
+          SELECT subscriptions_list, price_eur
+          FROM Quotes
+          WHERE quote_id=?
+        ''', [quote_id])
+        fetch_quote = quote_query.fetchone()
+
+        subscriptions_list = json.loads(fetch_quote[0])
+
+        for elements in subscriptions_list:
+          cursor.execute('''
+          UPDATE Subscriptions
+          SET status=2
+          WHERE subscription_id=?
+          ''', [elements])
       return {"message": "Payment unsuccessful"}
   else:
     return {"message": "Invoice already paid"}
@@ -285,20 +340,23 @@ async def pay_invoice(payload: Request):
 #1.Monthly Recurring Revenue (MRR) which is the predictable total revenue generated
 #by a company from all the active subscriptions in a particular month.
 
+# for subscriptions status = 0, temp status that we give when creating  the quote, 1 active, 2 cancelled
 
-@app.get("/mmr")
-async def mmr(payload: Request):
+
+@app.get("/mrr")
+async def mrr(payload: Request):
   values_dict = await payload.json()
   # Open the DB; 
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
 
+
+
 #2. Annual Recurring Revenue (ARR), which is the value of the recurring revenue of a
 #business's term subscriptions normalized for a single calendar year. It is a
 #subscription economy metric that shows the money that comes in every year for the
 #life of a subscription (or contract).
-
 
 @app.get("/arr")
 async def arr(payload: Request):

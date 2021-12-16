@@ -67,6 +67,11 @@ def select_random_companyid():
     chosen_companyid = cursor.fetchone()[0]
     return chosen_companyid
 
+def random_client_id():
+    cursor.execute('SELECT client_id FROM Clients ORDER BY RANDOM() LIMIT 1')
+    chosen_id = cursor.fetchone()[0]
+    return chosen_id
+
 def create_company(username, password, bankaccount, address, vatid, company_name):
     cursor.execute(''' 
             INSERT INTO Users(username,password,bankaccount,address)
@@ -82,7 +87,7 @@ def populate_companies():
         username = "".join(random_username())
         name =  "".join(get_company_names())
         create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
-populate_companies()
+
 def create_client(company_id, username, password, bankaccount, address):
     cursor.execute(''' 
         INSERT INTO Users(username,password,bankaccount,address)
@@ -98,8 +103,8 @@ def populate_clients():
     for i in range(1, 15):
         username = "".join(random_username())
         create_client(select_random_companyid(), username, random_password(8), random_number(),random_address())
-populate_clients()
-def create_subscriptions(amount, name):
+
+def create_subscriptions(amount, client_id, name):
     #cursor.execute('SELECT rate FROM Currencies WHERE name=?', [currency])
     #rate = float(cursor.fetchone()[0])
     #print(rate)
@@ -110,13 +115,14 @@ def create_subscriptions(amount, name):
     #    VALUES(?,?,?)''', (amount,currency,amount_euro))
     #new_price_id = int(cursor.lastrowid)
     cursor.execute('''
-        INSERT INTO Subscriptions(name, active, price)
-        VALUES(?,?,?)''', (name, 0, amount))
+        INSERT INTO Subscriptions(name, client_id, status, price)
+        VALUES(?,?,?,?)''', (name, client_id, 0, amount))
 
 def populate_subscriptions():
     for i in range(1, 15):
-        create_subscriptions(random_price(), random_company_name())
+        create_subscriptions(random_price(), random_client_id(), random_company_name())
 populate_subscriptions()
+
 def generate_quote_price():
     total_amount = 0
     currency = "EUR"

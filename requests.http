@@ -30,7 +30,7 @@ Content-Type: application/json
     "company_id": 10,
     "client_id": 16,
     "quantity": 1,
-    "subscriptions": "[1, 6, 8]",
+    "subscriptions": "[1, 8]",
     "accepted": 0
 }
 
@@ -73,7 +73,8 @@ Content-Type: application/json
 {
     "cardnumber": 79927398713,
     "currency": "USD",
-    "invoice_id": 1
+    "invoice_id": 1,
+    "client_id": 16
 }
 
 ###

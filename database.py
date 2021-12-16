@@ -114,8 +114,10 @@ dbase.execute(''' CREATE TABLE IF NOT EXISTS Subscriptions
     (
         subscription_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         name VARCHAR(64),
-        active BOOLEAN,
-        price INT NOT NULL
+        client_id INT NOT NULL,
+        status INT NOT NULL,
+        price INT NOT NULL,
+        FOREIGN KEY (client_id) REFERENCES Clients(client_id)
     )''')
 print("Table Subscriptions created successfully")
 
