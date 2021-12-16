@@ -96,9 +96,9 @@ async def subscription_creation(payload: Request):
     cursor = dbase.cursor()
 
     cursor.execute('''
-        INSERT INTO Subscriptions(name, active, price)
-        VALUES("{name}","{active}","{price}")'''.format(name = str(values_dict['name']),active=int(values_dict['active']), price=int(values_dict['price'])))
-
+        INSERT INTO Subscriptions(name,client_id,status,price)
+        VALUES("{name}","{client_id}","{status}","{price}")'''.format(name = str(values_dict['name']),client_id=int(values_dict['client_id']),status=int(values_dict['status']),price=int(values_dict['price'])))
+    return {"message": "Subscription successfuly created"}
 # API request : Quote creation
 
 @app.post("/quote_creation")
@@ -266,12 +266,6 @@ async def pay_invoice(payload: Request):
     price = price_eur * rate
 
     if checkCard(card_number):
-      cursor.execute('''
-        INSERT INTO Payments(invoice_id, amount_eur, currency_name, amount_currency, success, LastPaymentDate)
-        VALUES(?,?,?,?,?,?)
-      ''', (invoice,price_eur,currency,price, 1, date.isoformat(datetime.datetime.now())))
-      cursor.execute('UPDATE Invoices SET pending = 0 WHERE invoice_id=?', [invoice])
-
       pending_query = cursor.execute('''
         SELECT pending, quote_id
         FROM Invoices
@@ -279,24 +273,30 @@ async def pay_invoice(payload: Request):
         ''', [client_id])
 
       fetch = pending_query.fetchone()
+      print(fetch)
+      quote_id = fetch[1]
+      quote_query = cursor.execute('''
+        SELECT subscriptions_list, price_eur
+        FROM Quotes
+        WHERE quote_id=?
+      ''', [quote_id])
+      fetch_quote = quote_query.fetchone()
+      print(fetch_quote)
 
-      if fetch != None and fetch[0] == 1:
-        quote_id = fetch[1]
-        quote_query = cursor.execute('''
-          SELECT subscriptions_list, price_eur
-          FROM Quotes
-          WHERE quote_id=?
-        ''', [quote_id])
-        fetch_quote = quote_query.fetchone()
+      subscriptions_list = json.loads(fetch_quote[0])
 
-        subscriptions_list = json.loads(fetch_quote[0])
-
-        for elements in subscriptions_list:
-          cursor.execute('''
+      for elements in subscriptions_list:
+        cursor.execute('''
           UPDATE Subscriptions
           SET status=1
           WHERE subscription_id=?
-          ''', [elements])
+        ''', [elements])
+
+      cursor.execute('''
+        INSERT INTO Payments(invoice_id, amount_eur, currency_name, amount_currency, success, LastPaymentDate)
+        VALUES(?,?,?,?,?,?)
+      ''', (invoice,price_eur,currency,price, 1, date.isoformat(datetime.datetime.now())))
+      cursor.execute('UPDATE Invoices SET pending = 0 WHERE invoice_id=?', [invoice])
       return {"message": "Payment successful"}
     else:
       cursor.execute('''
@@ -312,23 +312,22 @@ async def pay_invoice(payload: Request):
 
       fetch = pending_query.fetchone()
 
-      if fetch != None and fetch[0] == 1:
-        quote_id = fetch[1]
-        quote_query = cursor.execute('''
-          SELECT subscriptions_list, price_eur
-          FROM Quotes
-          WHERE quote_id=?
-        ''', [quote_id])
-        fetch_quote = quote_query.fetchone()
+      quote_id = fetch[1]
+      quote_query = cursor.execute('''
+        SELECT subscriptions_list, price_eur
+        FROM Quotes
+        WHERE quote_id=?
+      ''', [quote_id])
+      fetch_quote = quote_query.fetchone()
 
-        subscriptions_list = json.loads(fetch_quote[0])
+      subscriptions_list = json.loads(fetch_quote[0])
 
-        for elements in subscriptions_list:
-          cursor.execute('''
+      for elements in subscriptions_list:
+        cursor.execute('''
           UPDATE Subscriptions
           SET status=2
           WHERE subscription_id=?
-          ''', [elements])
+        ''', [elements])
       return {"message": "Payment unsuccessful"}
   else:
     return {"message": "Invoice already paid"}
@@ -350,7 +349,31 @@ async def mrr(payload: Request):
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
+  company_id = values_dict['company_id']
 
+  cursor.execute('SELECT client_id FROM Clients WHERE company_id=?', [company_id])
+  df_one = pd.DataFrame(cursor.fetchall(), columns=['ids'])
+  print(df_one)
+  client_ids = df_one['ids'].to_list()
+  active = []
+  canceled = []
+  pending=[]
+
+  for ids in client_ids:
+    cursor.execute('SELECT status, price FROM Subscriptions WHERE client_id=?', [ids])
+    df_two = pd.DataFrame(cursor.fetchall(), columns=['Status','Price'])
+    if not df_two.empty:
+      active.append(df_two[df_two["Status"] == 1]["Price"].sum())
+      canceled.append(df_two[df_two["Status"] == 2]["Price"].sum())
+      cursor.execute('SELECT amount FROM Invoices WHERE pending=1 AND client_id=?', [ids])
+      df_three = pd.DataFrame(cursor.fetchall(), columns=['Amount'])
+    if not df_three.empty:
+        pending.append(df_three['Amount'].sum())
+  MRR = sum(active) + sum(pending) - sum(canceled)
+
+  return {"message": "Your MMR is: {MRR}".format(MRR=int(round(MRR, 2)))}
+#Note we didn't consider the fact that there could be upgrade or downgrades so our MRR is way more "simplified here" MRR should normally be:
+# Total amount from montly subs + total amount gained from new customers in month + total amount gained from upgrades and add ons in month - total amount lost from downgrades in motnh - total amount lost from churn
 
 
 #2. Annual Recurring Revenue (ARR), which is the value of the recurring revenue of a
@@ -365,6 +388,29 @@ async def arr(payload: Request):
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
+  company_id = values_dict['company_id']
+
+  cursor.execute('SELECT client_id FROM Clients WHERE company_id=?', [company_id])
+  df_one = pd.DataFrame(cursor.fetchall(), columns=['ids'])
+  print(df_one)
+  client_ids = df_one['ids'].to_list()
+  active = []
+  canceled = []
+  pending=[]
+
+  for ids in client_ids:
+    cursor.execute('SELECT status, price FROM Subscriptions WHERE client_id=?', [ids])
+    df_two = pd.DataFrame(cursor.fetchall(), columns=['Status','Price'])
+    if not df_two.empty:
+      active.append(df_two[df_two["Status"] == 1]["Price"].sum())
+      canceled.append(df_two[df_two["Status"] == 2]["Price"].sum())
+      cursor.execute('SELECT amount FROM Invoices WHERE pending=1 AND client_id=?', [ids])
+      df_three = pd.DataFrame(cursor.fetchall(), columns=['Amount'])
+    if not df_three.empty:
+        pending.append(df_three['Amount'].sum())
+  MRR = sum(active) + sum(pending) - sum(canceled)
+  ARR = MRR * 12
+  return {"message": "Your ARR is: {ARR}".format(ARR=int(round(ARR, 2)))}
 
 #3. Number of customers
 

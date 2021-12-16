@@ -17,7 +17,8 @@ Content-Type: application/json
 
 {
     "name": "Spotify",
-    "active": 0,
+    "status": 0,
+    "client_id": 16,
     "price": 12
 }
 
@@ -27,8 +28,8 @@ POST http://127.0.0.1:8000/quote_creation HTTP/1.1
 Content-Type: application/json
 
 {
-    "company_id": 10,
-    "client_id": 16,
+    "company_id": 3,
+    "client_id": 17,
     "quantity": 1,
     "subscriptions": "[1, 8]",
     "accepted": 0
@@ -39,8 +40,8 @@ POST http://127.0.0.1:8000/accepting_quote HTTP/1.1
 Content-Type: application/json
 
 {
-    "quote_id": 1,
-    "client_id": 16,
+    "quote_id": 4,
+    "client_id": 17,
     "accepted": 1
 
 }
@@ -51,8 +52,8 @@ POST http://127.0.0.1:8000/convert_quote HTTP/1.1
 Content-Type: application/json
 
 {
-    "quote_id": 1,
-    "client_id": 16,
+    "quote_id": 4,
+    "client_id": 17,
     "pending": 1
 }
 
@@ -62,7 +63,7 @@ POST http://127.0.0.1:8000/invoice HTTP/1.1
 Content-Type: application/json
 
 {
-    "client_id": 16
+    "client_id": 17
 }
 
 ###
@@ -73,8 +74,8 @@ Content-Type: application/json
 {
     "cardnumber": 79927398713,
     "currency": "USD",
-    "invoice_id": 1,
-    "client_id": 16
+    "invoice_id": 4,
+    "client_id": 17
 }
 
 ###
@@ -83,6 +84,6 @@ GET http://127.0.0.1:8000/number_customers HTTP/1.1
 Content-Type: application/json
 
 {
-    "company_id": 1
+    "company_id": 3
 }
 
