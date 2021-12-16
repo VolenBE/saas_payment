@@ -80,10 +80,48 @@ Content-Type: application/json
 
 ###
 
+
+
+GET http://127.0.0.1:8000/mrr HTTP/1.1
+Content-Type: application/json
+
+{
+    "company_id": 3
+}
+
+###
+
+GET http://127.0.0.1:8000/arr HTTP/1.1
+Content-Type: application/json
+
+{
+    "company_id": 3
+}
+
+###
 GET http://127.0.0.1:8000/number_customers HTTP/1.1
 Content-Type: application/json
 
 {
     "company_id": 3
 }
+
+###
+
+GET http://127.0.0.1:8000/average_revenue HTTP/1.1
+Content-Type: application/json
+
+{
+    "company_id": 3
+}
+
+###
+
+GET http://127.0.0.1:8000/customer_subs HTTP/1.1
+Content-Type: application/json
+
+{
+    "company_id": 3
+}
+
 
