@@ -46,11 +46,6 @@ def random_price():
     random_price = random.randint(5,100) 
     return random_price
 
-#def random_currency():
- #   cursor.execute('SELECT name FROM Currencies ORDER BY RANDOM() LIMIT 1') 
- #   random_currency = cursor.fetchone()[0]
- #   return random_currency
-
 def random_company_name():
     cursor.execute('SELECT company_name FROM Companies ORDER BY RANDOM() LIMIT 1') #we pick a random company from the db
     random_company_name = cursor.fetchone()[0]
@@ -87,7 +82,7 @@ def populate_companies():
         username = "".join(random_username())
         name =  "".join(get_company_names())
         create_company(username, random_password(8), random_number(), random_address(), random_number(), name)
-
+populate_companies()
 def create_client(company_id, username, password, bankaccount, address):
     cursor.execute(''' 
         INSERT INTO Users(username,password,bankaccount,address)
@@ -103,17 +98,8 @@ def populate_clients():
     for i in range(1, 15):
         username = "".join(random_username())
         create_client(select_random_companyid(), username, random_password(8), random_number(),random_address())
-
+populate_clients()
 def create_subscriptions(amount, client_id, name):
-    #cursor.execute('SELECT rate FROM Currencies WHERE name=?', [currency])
-    #rate = float(cursor.fetchone()[0])
-    #print(rate)
-    #amount_euro = amount / rate
-    #print(amount_euro)
-    #cursor.execute('''
-    #    INSERT INTO Prices(amount, currency,amount_euro)
-    #    VALUES(?,?,?)''', (amount,currency,amount_euro))
-    #new_price_id = int(cursor.lastrowid)
     cursor.execute('''
         INSERT INTO Subscriptions(name, client_id, status, price)
         VALUES(?,?,?,?)''', (name, client_id, 0, amount))
@@ -134,12 +120,3 @@ def generate_quote_price():
     cursor.execute('''
         INSERT INTO Prices(amount, currency,amount_euro)
         VALUES(?,?,?)''', (total_amount,currency,total_amount))
-
-#def update_rates():
-  #  url = 'https://v6.exchangerate-api.com/v6/0108a9426d9afb4ab050af15/latest/EUR'
-   # data = urllib.request.urlopen(url).read().decode()
-    
- #   obj = json.loads(data)
-
-#    for currency, rate in obj['conversion_rates'].items():
-#        cursor.execute('UPDATE Currencies SET rate=? WHERE name=?', (rate, currency))

@@ -52,17 +52,6 @@ dbase.execute(''' CREATE TABLE IF NOT EXISTS Analytics
     )''')
 print("Table Analytics created successfully")
 
-#Prices
-
-#dbase.execute(''' CREATE TABLE IF NOT EXISTS Prices
-    #(
-     #   price_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    #    amount INT NOT NULL,
-   #     currency VARCHAR(64) NOT NULL,
-  #      amount_euro INT NOT NULL
- #   )''')
-#print("Table Prices created successfully")
-
 #Quotes
 
 dbase.execute(''' CREATE TABLE IF NOT EXISTS Quotes
@@ -121,17 +110,6 @@ dbase.execute(''' CREATE TABLE IF NOT EXISTS Subscriptions
     )''')
 print("Table Subscriptions created successfully")
 
-# Currencies
-
-dbase.execute('''CREATE TABLE IF NOT EXISTS Currencies
-    (
-        currency_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-        name TEXT NOT NULL,
-        rate INT NOT NULL
-    )
-''')
-print("Table Currencies created successfully")
-
 # Technical
 
 dbase.execute('''CREATE TABLE IF NOT EXISTS Tech
@@ -140,12 +118,6 @@ dbase.execute('''CREATE TABLE IF NOT EXISTS Tech
     )
 ''')
 print("Table Tech created successfully")
-
-
-#dbase.execute(''' 
-#                INSERT INTO Users(username,password,bankaccount,address)
-#                VALUES('antoine','antoine',1023891,'avenue louise 12')
-#''')
 
 dbase.close()
 print('Database Closed')

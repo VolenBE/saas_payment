@@ -28,10 +28,10 @@ POST http://127.0.0.1:8000/quote_creation HTTP/1.1
 Content-Type: application/json
 
 {
-    "company_id": 3,
-    "client_id": 17,
+    "company_id": 7,
+    "client_id": 15,
     "quantity": 1,
-    "subscriptions": "[1, 8]",
+    "subscriptions": "[1, 2]",
     "accepted": 0
 }
 
@@ -40,8 +40,8 @@ POST http://127.0.0.1:8000/accepting_quote HTTP/1.1
 Content-Type: application/json
 
 {
-    "quote_id": 4,
-    "client_id": 17,
+    "quote_id": 1,
+    "client_id": 15,
     "accepted": 1
 
 }
@@ -52,8 +52,8 @@ POST http://127.0.0.1:8000/convert_quote HTTP/1.1
 Content-Type: application/json
 
 {
-    "quote_id": 4,
-    "client_id": 17,
+    "quote_id": 1,
+    "client_id": 15,
     "pending": 1
 }
 
@@ -63,7 +63,7 @@ POST http://127.0.0.1:8000/invoice HTTP/1.1
 Content-Type: application/json
 
 {
-    "client_id": 17
+    "client_id": 15
 }
 
 ###
@@ -74,8 +74,8 @@ Content-Type: application/json
 {
     "cardnumber": 79927398713,
     "currency": "USD",
-    "invoice_id": 4,
-    "client_id": 17
+    "invoice_id": 1,
+    "client_id": 15
 }
 
 ###
@@ -86,7 +86,7 @@ GET http://127.0.0.1:8000/mrr HTTP/1.1
 Content-Type: application/json
 
 {
-    "company_id": 3
+    "company_id": 7
 }
 
 ###
@@ -95,7 +95,7 @@ GET http://127.0.0.1:8000/arr HTTP/1.1
 Content-Type: application/json
 
 {
-    "company_id": 3
+    "company_id": 7
 }
 
 ###
@@ -103,7 +103,7 @@ GET http://127.0.0.1:8000/number_customers HTTP/1.1
 Content-Type: application/json
 
 {
-    "company_id": 3
+    "company_id": 7
 }
 
 ###
@@ -112,7 +112,7 @@ GET http://127.0.0.1:8000/average_revenue HTTP/1.1
 Content-Type: application/json
 
 {
-    "company_id": 3
+    "company_id": 7
 }
 
 ###
@@ -121,7 +121,7 @@ GET http://127.0.0.1:8000/customer_subs HTTP/1.1
 Content-Type: application/json
 
 {
-    "company_id": 3
+    "company_id": 7
 }
 
 

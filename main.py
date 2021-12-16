@@ -72,7 +72,6 @@ def get_rate(selected_currency):
 @app.post("/register_client")
 async def register_client(payload: Request):
     values_dict = await payload.json()
-    # Open the DB
     dbase = sqlite3.connect('database.db', isolation_level=None)
     cursor = dbase.cursor()
 
@@ -91,7 +90,6 @@ async def register_client(payload: Request):
 @app.post("/subscription_creation")
 async def subscription_creation(payload: Request):
     values_dict = await payload.json()
-    # Open the DB
     dbase = sqlite3.connect('database.db', isolation_level=None)
     cursor = dbase.cursor()
 
@@ -104,7 +102,6 @@ async def subscription_creation(payload: Request):
 @app.post("/quote_creation")
 async def quote_creation(payload: Request):
     values_dict = await payload.json()
-    # Open the DB
     dbase = sqlite3.connect('database.db', isolation_level=None)
     cursor = dbase.cursor()
     total_price = 0
@@ -137,7 +134,6 @@ async def quote_creation(payload: Request):
 @app.post("/accepting_quote")
 async def accepting_quote(payload: Request):
   values_dict = await payload.json()
-  # Open the DB
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
@@ -167,7 +163,6 @@ async def accepting_quote(payload: Request):
 @app.post("/convert_quote")
 async def convert_quote(payload: Request):
   values_dict = await payload.json()
-  # Open the DB; 
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
@@ -197,7 +192,6 @@ async def convert_quote(payload: Request):
 @app.post("/invoice")
 async def invoice(payload: Request):
   values_dict = await payload.json()
-  # Open the DB; 
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
@@ -231,7 +225,6 @@ async def invoice(payload: Request):
       ''', [elements])
       name = cursor.fetchone()[0]
       name_list.append(name)
-      #print(json.dumps(name_list))
 
     price = fetch_quote[1]
 
@@ -245,7 +238,6 @@ async def invoice(payload: Request):
 @app.post("/pay_invoice")
 async def pay_invoice(payload: Request):
   values_dict = await payload.json()
-  # Open the DB; 
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
@@ -345,7 +337,6 @@ async def pay_invoice(payload: Request):
 @app.get("/mrr")
 async def mrr(payload: Request):
   values_dict = await payload.json()
-  # Open the DB; 
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
@@ -353,7 +344,6 @@ async def mrr(payload: Request):
 
   cursor.execute('SELECT client_id FROM Clients WHERE company_id=?', [company_id])
   df_one = pd.DataFrame(cursor.fetchall(), columns=['ids'])
-  print(df_one)
   client_ids = df_one['ids'].to_list()
   active = []
   canceled = []
@@ -384,7 +374,6 @@ async def mrr(payload: Request):
 @app.get("/arr")
 async def arr(payload: Request):
   values_dict = await payload.json()
-  # Open the DB; 
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
@@ -392,7 +381,7 @@ async def arr(payload: Request):
 
   cursor.execute('SELECT client_id FROM Clients WHERE company_id=?', [company_id])
   df_one = pd.DataFrame(cursor.fetchall(), columns=['ids'])
-  print(df_one)
+
   client_ids = df_one['ids'].to_list()
   active = []
   canceled = []
@@ -417,7 +406,6 @@ async def arr(payload: Request):
 @app.get("/number_customers")
 async def number_customers(payload: Request):
   values_dict = await payload.json()
-  # Open the DB; 
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
@@ -441,7 +429,6 @@ async def number_customers(payload: Request):
 @app.get("/average_revenue")
 async def average_revenue(payload: Request):
   values_dict = await payload.json()
-  # Open the DB; 
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
@@ -467,7 +454,6 @@ async def average_revenue(payload: Request):
 @app.get("/customer_subs")
 async def customer_subs(payload: Request):
   values_dict = await payload.json()
-  # Open the DB; 
   dbase = sqlite3.connect('database.db', isolation_level=None)
   cursor = dbase.cursor()
 
@@ -486,7 +472,7 @@ async def customer_subs(payload: Request):
       cursor.execute('SELECT quote_id FROM Quotes WHERE client_id=?', [ids])
       second_df = pd.DataFrame(cursor.fetchall(), columns=['Quotes ids'])
       quote_ids = second_df['Quotes ids'].to_list()
-      print(quote_ids)
+
       if quote_ids: #si l'array n'est pas vide
           for qids in quote_ids: # on réalise une itteration sur les différents quote id
               cursor.execute('SELECT subscriptions_list FROM Quotes WHERE quote_id=?', [qids])
@@ -502,8 +488,6 @@ async def customer_subs(payload: Request):
           name_list.append(el_list)
       else: #si l'array est vide
           name_list.append("No subscription")
-
-  print(name_list)
 
   main_df['Names'] = customers_name # columns names
   main_df['Subscriptions'] = name_list #column subs
